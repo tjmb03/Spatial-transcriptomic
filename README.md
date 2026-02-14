@@ -1,5 +1,5 @@
-#Spatial Transcriptomics Analysis Framework
-##Seurat-Based Workflows • HD & Sequence-Based Platforms • BANKSY Integration
+# Spatial Transcriptomics Analysis Framework
+## Seurat-Based Workflows • HD & Sequence-Based Platforms • BANKSY Integration
 
 This repository contains spatial transcriptomics analysis workflows built in R using Seurat, designed for:
 
