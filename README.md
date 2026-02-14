@@ -1,14 +1,54 @@
-# Spatial Transcriptomics Analysis Framework
-## Seurat-Based Workflows • HD & Sequence-Based Platforms • BANKSY Integration
+# Spatial Transcriptomics Analysis (R / Seurat)
 
-This repository contains spatial transcriptomics analysis workflows built in R using Seurat, designed for:
+Reproducible spatial transcriptomics workflows built in R using Seurat.
 
--High-resolution (HD) spatial datasets
+This repository demonstrates structured pipelines for spatial data preprocessing, clustering, and spatially informed domain detection across high-resolution and sequencing-based platforms.
 
--Sequence-based spatial platforms
+---
 
--Spatial clustering and neighborhood modeling
+## Contents
 
--Integration of spatial context into transcriptomic analysis
+### 📂 HD/
+High-definition spatial workflow examples.
 
-The goal of this repository is to provide structured, reproducible pipelines for spatial data preprocessing, clustering, and spatially informed feature analysis.
+### 📂 sequence-based/
+Sequencing-based spatial analysis pipeline.
+
+### 📄 Seurat Spatial Workflow.R  
+Core Seurat spatial pipeline:
+- QC and filtering  
+- Normalization  
+- Dimensionality reduction  
+- Clustering  
+- Spatial visualization  
+
+### 📄 BANKSY.R  
+Spatially informed clustering using BANKSY:
+- Neighborhood modeling  
+- Spatial smoothing  
+- Domain refinement  
+
+---
+
+## Capabilities Demonstrated
+
+- Seurat spatial object construction  
+- QC and normalization of spatial data  
+- PCA / UMAP embedding  
+- Tissue overlay visualization  
+- Spatially aware clustering  
+
+---
+
+## Requirements
+
+- R ≥ 4.2  
+- Seurat  
+- ggplot2  
+- dplyr  
+
+Install core packages:
+
+```r
+install.packages(c("Seurat", "ggplot2", "dplyr"))
+
