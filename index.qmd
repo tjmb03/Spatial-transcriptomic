@@ -1,0 +1,187 @@
+---
+title: "Glaucoma Spatial Transcriptomics Pipeline"
+subtitle: "A preregistered single-nucleus spatial transcriptomics workflow for documenting pathological microenvironment development in glaucoma"
+page-layout: full
+toc: false
+---
+
+```{=html}
+<section class="pipeline-hero">
+  <h1>Glaucoma <span>Spatial</span><br>Transcriptomics</h1>
+  <p class="lead">
+    Slide-tag snRNA-seq → Seurat v5 → scVI → scVelo → CellRank 2 —
+    a preregistered pipeline linking spatial fate trajectories to therapeutic targets
+    across four disease timepoints.
+  </p>
+  <div style="margin-top:2rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
+    <a href="methods.qmd" style="display:inline-flex;align-items:center;gap:0.4em;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.35);color:#f5c842;padding:0.5rem 1.1rem;border-radius:5px;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;text-decoration:none;letter-spacing:0.02em;">
+      Methods &amp; Design →
+    </a>
+    <a href="validation.qmd" style="display:inline-flex;align-items:center;gap:0.4em;background:rgba(61,214,200,0.08);border:1px solid rgba(61,214,200,0.25);color:#3dd6c8;padding:0.5rem 1.1rem;border-radius:5px;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;text-decoration:none;letter-spacing:0.02em;">
+      Validation Suite →
+    </a>
+    <a href="targets.qmd" style="display:inline-flex;align-items:center;gap:0.4em;background:rgba(155,168,188,0.08);border:1px solid rgba(155,168,188,0.2);color:#9ba8bc;padding:0.5rem 1.1rem;border-radius:5px;font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;text-decoration:none;letter-spacing:0.02em;">
+      Therapeutic Targets →
+    </a>
+  </div>
+</section>
+```
+
+## At a Glance
+
+```{=html}
+<div class="metric-grid">
+  <div class="metric-card">
+    <span class="metric-value">20</span>
+    <span class="metric-label">Slide-tag runs</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">4</span>
+    <span class="metric-label">Disease timepoints</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">11</span>
+    <span class="metric-label">Validation checkpoints</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">7</span>
+    <span class="metric-label">scVI tests</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">4</span>
+    <span class="metric-label">Terminal states</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">3-tier</span>
+    <span class="metric-label">Target scoring</span>
+  </div>
+</div>
+```
+
+## Pipeline Dependency Graph
+
+Each node is an executable script. Arrows indicate data flow. Yellow nodes require GPU; teal nodes are R; the rest are Python.
+
+```{mermaid}
+%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor':'#172035','primaryTextColor':'#e8e4d9','primaryBorderColor':'#f5c842','lineColor':'#576880','secondaryColor':'#0e1629','tertiaryColor':'#050b18','edgeLabelBackground':'#0e1629','nodeBorder':'#f5c842'}}}%%
+
+flowchart TD
+    A(["`**Raw Slide-tag FASTQ**
+    R1: barcode+UMI / R2: cDNA`"]) --> B
+
+    B["`**01_starsolo_alignment.sh**
+    STARsolo · Velocyto spliced/unspliced
+    Spatial barcode registration`"]
+
+    B --> C["`**02_seurat_processing.R**
+    QC · Clustering · Spatial mapping
+    Reference label transfer`"]
+
+    B --> D[("`**spatial_coordinates.tsv**
+    x_um · y_um per barcode`")]
+
+    C --> E["`**SeuratDisk → h5ad**
+    R → Python bridge`"]
+    D --> E
+
+    E --> F["`**03_scvi_integration.py**
+    Batch correction · 7-test validation
+    scVI latent embedding`"]
+
+    F --> G["`**04_scvelo_velocity.py**
+    Dynamical mode
+    scVI neighbor graph`"]
+
+    G --> H["`**05_cellrank_trajectories.py**
+    VelocityKernel + SpatialKernel
+    Weight optimization · GPCCA`"]
+
+    H --> I["`**06_spatial_statistics.py**
+    Global Moran's I
+    LISA · Hotspot tracking`"]
+
+    H --> J["`**07_lineage_drivers_and_targets.py**
+    Driver genes · Temporal classification
+    GSEApy · Target scoring`"]
+
+    I --> K(["`**PRIMARY ENDPOINT**
+    Mann-Whitney U
+    Moran's I mid vs baseline`"])
+
+    J --> L(["`**Therapeutic targets**
+    Composite score ranked list`"])
+
+    style A fill:#172035,stroke:#f5c842,color:#e8e4d9
+    style B fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9
+    style C fill:#172035,stroke:#3dd6c8,color:#e8e4d9
+    style D fill:#0a0f1e,stroke:#576880,color:#9ba8bc
+    style E fill:#0e1629,stroke:#576880,color:#9ba8bc
+    style F fill:#172035,stroke:#f5c842,color:#e8e4d9
+    style G fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9
+    style H fill:#172035,stroke:#f5c842,color:#e8e4d9
+    style I fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9
+    style J fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9
+    style K fill:#0a0f1e,stroke:#f5c842,color:#f5c842
+    style L fill:#0a0f1e,stroke:#3dd6c8,color:#3dd6c8
+```
+
+## Experimental Design
+
+The pipeline targets the **mouse microbead occlusion model** of glaucoma (C57BL/6J), which provides inducible IOP elevation with timed onset, wild-type background, and compatibility with Slide-tag. Contralateral eyes serve as within-animal controls.
+
+| Design element | Choice | Rationale |
+|---|---|---|
+| **Platform** | Slide-tag | True single-nucleus resolution; R2 cDNA enables RNA velocity |
+| **Model** | C57BL/6J microbead occlusion | Inducible, timed, no confounding mutations |
+| **Timepoints** | Baseline / Early (2–4 wk) / Mid (6–8 wk) / Late (12+ wk) | Captures initiation through established neurodegeneration |
+| **Replicates** | 5 animals × 4 timepoints × 2 eyes | Powers scCODA (≥3) and Moran's I test (≥300 RGCs/group) |
+| **Tissues** | Retina cross-section + ONH | RGC bodies + axon injury site |
+| **Control** | Contralateral eye | Within-animal removes inter-animal IOP variability |
+
+## Key Cell Populations
+
+```{=html}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0;">
+
+  <div class="test-block" style="border-left-color:#f5c842;">
+    <div class="test-id">Primary target</div>
+    <div class="test-title">Retinal Ganglion Cells</div>
+    <p style="font-size:0.88rem;color:#9ba8bc;margin:0;">Subtypes tracked individually. Terminal state: <code>RGC_apoptotic</code> defined by Casp3/Casp9/Bax↑, Rbpms/Thy1↓</p>
+  </div>
+
+  <div class="test-block" style="border-left-color:#3dd6c8;">
+    <div class="test-id">Glial response</div>
+    <div class="test-title">Müller Glia</div>
+    <p style="font-size:0.88rem;color:#9ba8bc;margin:0;">Terminal state: <code>Muller_reactive</code>. Gfap/Vim/Lcn2↑, Rlbp1/Glul↓. Key mediator of neuroprotection vs. toxicity switch.</p>
+  </div>
+
+  <div class="test-block" style="border-left-color:#9ba8bc;">
+    <div class="test-id">Neuroinflammation</div>
+    <div class="test-title">Microglia (DAM)</div>
+    <p style="font-size:0.88rem;color:#9ba8bc;margin:0;">Terminal state: <code>Microglia_DAM</code>. Trem2/Apoe/Lpl/Cst7↑, P2ry12/Cx3cr1↓. Spatially tracked near ONH.</p>
+  </div>
+
+  <div class="test-block" style="border-left-color:#f4617a;">
+    <div class="test-id">ONH-specific</div>
+    <div class="test-title">ONH Astrocytes</div>
+    <p style="font-size:0.88rem;color:#9ba8bc;margin:0;">Terminal state: <code>Astrocyte_reactive_ONH</code>. Gfap/Serpina3n/C3↑. Lamina cribrosa-adjacent remodeling.</p>
+  </div>
+
+</div>
+```
+
+## Reference Datasets
+
+The pipeline uses public datasets at two points: as annotation references (cell type label transfer) and as biological benchmarks (expected gene signatures at known disease stages).
+
+| Dataset | Access | Role |
+|---|---|---|
+| MRCA — Li et al. 2024 | [GSE243413](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243413) / [SCP2560](https://singlecell.broadinstitute.org/single_cell/study/SCP2560) | Primary label transfer reference (189k adult C57BL/6J cells) |
+| Macosko et al. 2015 | [GSE63473](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63473) | Founding annotation; baseline cell proportion priors |
+| Tran/Sanes et al. 2019 | [GSE133382](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133382) | RGC subtype atlas (46 types, ONC time series) |
+| Benhar et al. 2023 | [GSE199317](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE199317) | Non-neuronal temporal atlas post-ONC |
+| Keuthan et al. 2023 | [GSE241782](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE241782) | Microbead bulk RNA-seq benchmark (retina + UON + MON) |
+
+::: {.callout-note}
+**The novelty gap.** No public spatial transcriptomics dataset (Slide-tag, Slide-seq, or Visium) exists for any glaucoma model — mouse, rat, or primate. The Keuthan 2023 data is the closest proxy available: bulk RNA-seq of the same microbead model with regional dissection. Your pipeline should reproduce its bulk-level signals (Gfap/Osmr/Edn2 upregulation at early timepoints; ECM remodeling in ONH) as a cross-platform validation checkpoint before primary endpoint analysis.
+:::

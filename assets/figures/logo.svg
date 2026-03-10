@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" width="120" height="32">
+  <g transform="translate(16,16)">
+    <circle cx="0" cy="0" r="13" fill="none" stroke="#f5c842" stroke-width="1.2" opacity="0.25"/>
+    <circle cx="0" cy="0" r="9"  fill="none" stroke="#f5c842" stroke-width="1.2" opacity="0.45"/>
+    <circle cx="0" cy="0" r="5"  fill="none" stroke="#f5c842" stroke-width="1.5" opacity="0.75"/>
+    <line x1="-9" y1="3" x2="8" y2="-6" stroke="#3dd6c8" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="8,-6 3,-9 5,-3" fill="#3dd6c8"/>
+    <circle cx="0" cy="0" r="2" fill="#f5c842"/>
+  </g>
+  <text x="36" y="11" font-family="'Syne', sans-serif" font-size="8" font-weight="800"
+        fill="#f5c842" letter-spacing="0.06em">GLAUCOMA ST</text>
+  <text x="36" y="23" font-family="'Syne', sans-serif" font-size="6.5" font-weight="400"
+        fill="#9ba8bc" letter-spacing="0.08em">PIPELINE v1.0</text>
+</svg>

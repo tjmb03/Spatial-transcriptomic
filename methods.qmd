@@ -1,0 +1,268 @@
+---
+title: "Methods & Design"
+subtitle: "Preregistered analytical plan, statistical framework, and key design decisions"
+---
+
+## Preregistration
+
+All analysis parameters are frozen in `config/preregistration.py` as a SHA256-hashed dictionary. The pipeline verifies the hash at startup via `validate_preregistration()` — if the dictionary has been modified after the hash was recorded, the pipeline either warns (development mode) or refuses to run (production mode).
+
+```{=html}
+<div style="margin:1.5rem 0;">
+  <div style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ba8bc;margin-bottom:0.5rem;">Preregistration SHA256 (replace before data collection)</div>
+  <div class="prereg-hash">UNSET — run: python3 -c "from config.preregistration import compute_hash; print(compute_hash())"</div>
+</div>
+```
+
+::: {.callout-important}
+**Lock the hash before any data touches the pipeline.** Commit `preregistration.py` with the hash set, push to git, and register on OSF or AsPredicted. The git commit SHA and registration DOI go into `registration_doi` and `registration_date` fields in the same file.
+:::
+
+### What is frozen
+
+The following cannot be modified after hash registration without explicit declaration in the manuscript as a deviation:
+
+- QC thresholds (min genes, max % mitochondrial, min cells per sample)
+- scVI configuration (`batch_key`, covariate structure, `n_layers`, `n_latent`, `gene_likelihood`)
+- Terminal state marker definitions (up- and down-regulated genes per state)
+- Spatial statistics parameters (bandwidths, primary bandwidth, permutation count)
+- Kernel weight optimization protocol (grid, metric, locking procedure)
+- Therapeutic target scoring tier weights (3 / 2 / 1)
+- Primary endpoint specification (test, direction, α, power target)
+
+---
+
+## Primary Endpoint
+
+**Preregistered primary endpoint:**
+
+> Moran's I of RGC apoptotic fate probability at the mid timepoint compared to baseline, computed at the primary bandwidth of 100 µm with a Gaussian kernel (row-standardized). Statistical test: one-sided Mann-Whitney U comparing per-animal Moran's I values between mid and baseline groups, with Benjamini-Hochberg FDR correction. α = 0.05.
+
+The biological rationale is that spatially autocorrelated RGC apoptotic fate probability — cells with high apoptotic fate clustered near other high-fate cells — should increase as glaucomatous neurodegeneration spreads from focal injury sites. Moran's I quantifies this spatial clustering:
+
+$$
+I = \frac{n}{\sum_i \sum_j w_{ij}} \cdot \frac{\sum_i \sum_j w_{ij}(y_i - \bar{y})(y_j - \bar{y})}{\sum_i (y_i - \bar{y})^2}
+$$
+
+where $y_i$ is the RGC apoptotic fate probability of cell $i$, $w_{ij}$ is the Gaussian spatial weight between cells $i$ and $j$, and $n$ is the number of spatially mapped cells per section. $I \in [-1, 1]$; values approaching 1 indicate strong spatial clustering of high-fate cells.
+
+### Power calculation
+
+```{=html}
+<div class="test-block" style="border-left-color:#f5c842;">
+  <div class="test-id">Power target: 0.80</div>
+  <div class="test-title">Sample size justification</div>
+  <table style="font-size:0.88rem;width:100%;margin-top:0.5rem;">
+    <tr>
+      <td style="color:#9ba8bc;padding:0.2rem 0.5rem 0.2rem 0;">Effect size source</td>
+      <td>Harwerth et al. — 40–50% RGC loss at mid-stage glaucoma (Cohen's d ≈ 0.8)</td>
+    </tr>
+    <tr>
+      <td style="color:#9ba8bc;padding:0.2rem 0.5rem 0.2rem 0;">RGC count target</td>
+      <td>≥ 300 RGCs per group (≥ 150 minimum for medium effect Δ = 0.15)</td>
+    </tr>
+    <tr>
+      <td style="color:#9ba8bc;padding:0.2rem 0.5rem 0.2rem 0;">Spatial cells target</td>
+      <td>≥ 800 cells/section for Moran's I power; target 400+ minimum</td>
+    </tr>
+    <tr>
+      <td style="color:#9ba8bc;padding:0.2rem 0.5rem 0.2rem 0;">Biological replicates</td>
+      <td>5 animals × 4 timepoints = 20 Slide-tag runs</td>
+    </tr>
+    <tr>
+      <td style="color:#9ba8bc;padding:0.2rem 0.5rem 0.2rem 0;">Statistical unit</td>
+      <td>Per-animal Moran's I (not per-cell) — avoids pseudoreplication</td>
+    </tr>
+  </table>
+</div>
+```
+
+---
+
+## Alignment: STARsolo Configuration
+
+### Slide-tag read structure
+
+```
+R1 (28 bp):  [——16 bp barcode——][——12 bp UMI——]
+R2 (variable): [——————— cDNA ———————]
+```
+
+Critical STARsolo parameters for Slide-tag:
+
+```bash
+--soloType CB_UMI_Simple
+--soloCBstart 1  --soloCBlen 16    # spatial barcode position in R1
+--soloUMIstart 17 --soloUMIlen 12  # UMI position in R1
+--soloFeatures Gene GeneFull Velocyto   # spliced + unspliced for velocity
+--outFilterMultimapNmax 10
+--outFilterScoreMinOverLread 0.3    # permissive for pre-mRNA reads
+--soloMultiMappers EM               # EM deduplication for multi-mappers
+--soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts
+```
+
+::: {.callout-warning}
+**GTF preparation matters.** Filter the genome annotation to protein-coding + lncRNA genes only before building the STAR index. Including pseudogenes inflates multi-mapping rates and can corrupt velocity estimates. Use `eisar` (R) or `pyranges` (Python) to generate pre-mRNA (intron) annotations.
+:::
+
+### Spatial barcode registration
+
+After alignment, STARsolo cell barcodes are mapped to puck coordinates via 1-Hamming distance correction. Cells that cannot be unambiguously assigned to a puck barcode are excluded. The pipeline records per-sample spatial mapping rate in `spatial_qc.json`.
+
+**QC gate:** ≥ 70% of post-filter cells must have spatial coordinates. Samples below this threshold fail the alignment checkpoint.
+
+### Velocity QC targets
+
+| Metric | Target | Failure action |
+|---|---|---|
+| Genes with detectable unspliced | ≥ 40% | Check GTF intron annotation |
+| Median unspliced/spliced ratio | 0.10 – 0.40 | If < 0.10: alignment issue; if > 0.40: genomic DNA contamination |
+| Unique mapping rate | ≥ 60% | Check genome index; consider `--outFilterScoreMinOverLread 0.2` |
+
+---
+
+## Batch Correction: scVI Architecture
+
+The core design decision is treating `sample_id` as the batch key and `timepoint` as a **biological covariate**, not a batch. This distinction is critical: if timepoint is treated as batch, scVI will correct away the temporal signal that is the primary object of study.
+
+$$
+p(\mathbf{x}_n \mid \mathbf{z}_n, \mathbf{s}_n) = \text{NB}\!\left(\mu_{ng}, \theta_{ng}\right)
+$$
+
+$$
+\mu_{ng} = \ell_n \cdot f_g(\mathbf{z}_n, \mathbf{s}_n)
+$$
+
+where $\mathbf{x}_n$ is the observed count vector for cell $n$, $\mathbf{z}_n \in \mathbb{R}^{30}$ is the scVI latent embedding, $\mathbf{s}_n$ is the batch (sample) indicator, $\ell_n$ is the library size scaling factor, and $f_g$ is a neural network decoder per gene.
+
+### Configuration
+
+```python
+scvi.model.SCVI.setup_anndata(
+    adata,
+    layer                      = "counts",
+    batch_key                  = "sample_id",        # ← batch
+    categorical_covariate_keys = ["timepoint"],      # ← biological covariate
+    continuous_covariate_keys  = ["pct_mito",
+                                   "log_total_counts"],
+)
+
+model = scvi.model.SCVI(
+    adata,
+    n_layers        = 2,
+    n_latent        = 30,
+    gene_likelihood = "nb",
+    dispersion      = "gene-batch",   # per-gene, per-batch dispersion
+)
+```
+
+---
+
+## RNA Velocity: scVI Bridge
+
+RNA velocity requires that the neighbor graph used for `scv.pp.moments()` be computed in a batch-corrected space. The bridge between scVI and scVelo is a single line:
+
+```python
+sc.pp.neighbors(adata, use_rep="X_scVI", n_neighbors=30)
+scv.pp.moments(adata, n_pcs=None, n_neighbors=30, use_rep="X_scVI")
+scv.tl.recover_dynamics(adata, n_jobs=8)
+scv.tl.velocity(adata, mode="dynamical")
+```
+
+If this bridge is omitted and the neighbor graph is computed from PCA instead, velocity vectors will reflect batch structure rather than biology in multi-sample datasets.
+
+---
+
+## CellRank: Kernel Construction
+
+The combined kernel balances directional information from RNA velocity with spatial neighbourhood constraints:
+
+$$
+\mathbf{T}_\text{combined} = w \cdot \mathbf{T}_\text{velocity} + (1 - w) \cdot \mathbf{T}_\text{spatial}
+$$
+
+where $\mathbf{T}$ is a row-stochastic cell-cell transition matrix and $w$ is the velocity kernel weight.
+
+### Weight optimization protocol
+
+The weight $w$ is optimized empirically before fate probabilities are extracted — this is the key preregistration discipline that prevents post-hoc trajectory fitting:
+
+1. Assign ground-truth terminal state labels to cells using locked marker criteria (quantile thresholds on up/down gene sets)
+2. Grid search $w \in \{0.1, 0.2, \ldots, 0.9\}$
+3. For each $w$: build kernel → run GPCCA → extract macrostate membership probabilities → compute cross-entropy loss against terminal labels
+4. Select $\hat{w} = \arg\min_w \mathcal{L}_\text{CE}(w)$
+5. **Lock** $\hat{w}$ in `kernel_weights.json` before calling `estimator.compute_fate_probabilities()`
+
+The weights file is write-once. The validation orchestrator checks that weights were locked before fate probability extraction by verifying the file's modification timestamp precedes the `fate_adata.h5ad` creation timestamp.
+
+### GPCCA macrostate scan
+
+GPCCA is run for $n_\text{states} \in [4, 8]$. The optimal $n$ is selected by maximizing the entropy of the coarse-grained stationary distribution — more distinct macrostates produce higher entropy when the decomposition is stable:
+
+$$
+n^* = \arg\max_n \left[ -\sum_{k} \pi_k \log \pi_k \right]
+$$
+
+---
+
+## Spatial Statistics Framework
+
+Three analyses at three bandwidths (50, 100, 200 µm):
+
+### Global Moran's I
+
+Computed per animal (not pooled) to preserve biological replicates as the correct statistical unit. The spatial weight matrix uses a Gaussian kernel with fixed bandwidth, row-standardized:
+
+$$
+w_{ij} = \frac{\exp\!\left(-\frac{d_{ij}^2}{2\sigma^2}\right)}{\sum_k \exp\!\left(-\frac{d_{ik}^2}{2\sigma^2}\right)}
+$$
+
+Significance is assessed via 999-permutation test ($p_\text{sim}$), not the normal approximation.
+
+### Local Moran's I (LISA)
+
+Cells are classified into four quadrants based on their own value $y_i$ and the spatially lagged value $\bar{y}_i = \sum_j w_{ij} y_j$:
+
+| Quadrant | Interpretation |
+|---|---|
+| **HH** — high $y_i$, high $\bar{y}_i$ | Hotspot: high-fate cell surrounded by high-fate cells |
+| **LL** — low $y_i$, low $\bar{y}_i$ | Coldspot: healthy region |
+| **LH** — low $y_i$, high $\bar{y}_i$ | Spatial outlier |
+| **HL** — high $y_i$, low $\bar{y}_i$ | Spatial outlier |
+
+### Hotspot tracking
+
+HH clusters are tracked across timepoints using the convex hull of HH cell coordinates:
+
+$$
+A_\text{hotspot}(t) = \text{Vol}\!\left[\text{ConvexHull}\!\left(\{(x_i, y_i) : \text{quad}_i = \text{HH}, t_i = t\}\right)\right]
+$$
+
+Monotonic increase in $A_\text{hotspot}(t)$ across timepoints provides secondary evidence for progressive spatial spread of neurodegeneration.
+
+---
+
+## Secondary Statistical Analyses
+
+### Cell composition (scCODA)
+
+Dirichlet-multinomial model for compositional changes across timepoints. Requires ≥ 3 biological replicates per group; pipeline targets 5.
+
+```python
+import sccoda
+model = sccoda.util.comp_ana.CompositionalAnalysis(
+    data, formula="timepoint", reference_cell_type="Rod"
+)
+```
+
+### Driver gene temporal classification
+
+Each driver gene is classified into one of five temporal dynamics patterns based on expression in high-fate cells (fate probability > 0.5) across timepoints:
+
+| Class | Pattern | Significance |
+|---|---|---|
+| **Progressive** | Monotonically increasing | Core disease driver throughout |
+| **Early** | Peak at early, decline later | Initiation-phase target |
+| **Late** | Peak at mid/late | Established disease target |
+| **Transient** | Peak at mid, lower at late | Adaptive response, may be protective |
+| **Stable** | Constant across timepoints | Constitutive — less druggable |

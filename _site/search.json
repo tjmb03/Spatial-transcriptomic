@@ -1,0 +1,233 @@
+[
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "All citations in this documentation refer to published tools, datasets, and statistical methods used by the pipeline. Full citation details are in references.bib.\n\n\n1. Macosko, E. Z. et al. Highly parallel genome-wide expression profiling of individual cells using nanoliter droplets. Cell 161, 1202–1214 (2015).\n\n\n2. Tran, N. M. et al. Single-cell profiles of retinal ganglion cells differing in resilience to injury reveal neuroprotective genes. Neuron 104, 1039–1055 (2019).\n\n\n3. Benhar, I., London, A., Ousman, S. & Schwartz, M. Temporal single-cell atlas of non-neuronal retinal cells reveals dynamic murine glial and immune cell crosstalk. Nature Immunology 24, 1559–1574 (2023).\n\n\n4. Keuthan, C. J. et al. Experimental glaucoma and optic nerve crush mouse models induce different gene expression programs in retina and optic nerve. International Journal of Molecular Sciences 24, 13423 (2023).\n\n\n5. Hao, Y. et al. Dictionary learning for integrative, multimodal and scalable single-cell analysis. Nature Biotechnology 42, 293–304 (2024).\n\n\n6. Lopez, R., Regier, J., Cole, M. B., Jordan, M. I. & Yosef, N. Deep generative modeling for single-cell transcriptomics. Nature Methods 15, 1053–1058 (2018).\n\n\n7. Bergen, V., Lange, M., Peidli, S., Wolf, F. A. & Theis, F. J. Generalizing RNA velocity to transient cell states through dynamical modeling. Nature Biotechnology 38, 1408–1414 (2020).\n\n\n8. Weiler, P., Lange, M., Klein, M., Pe’er, D. & Theis, F. CellRank 2: Unified fate mapping in multiview single-cell data. Nature Methods 21, 1196–1205 (2024).\n\n\n9. Kaminow, B., Yunusov, D. & Dobin, A. STARsolo: Accurate, fast and versatile mapping/quantification of single-cell and single-nucleus RNA-seq data. bioRxiv https://doi.org/10.1101/2021.05.05.442755 (2021) doi:10.1101/2021.05.05.442755.\n\n\n10. Anselin, L. Local indicators of spatial association — LISA. Geographical Analysis 27, 93–115 (1995).\n\n\n11. Rey, S. J. & Anselin, L. PySAL: A python library of spatial analytical methods. The Review of Regional Studies 37, 5–27 (2007).\n\n\n12. Wiggs, J. L. et al. Common variants at 9p21 and 8q22 are associated with increased susceptibility to optic nerve degeneration in glaucoma. PLoS Genetics 8, e1002654 (2012).\n\n\n13. Gharahkhani, P. et al. Genome-wide meta-analysis identifies 127 open-angle glaucoma loci with consistent effect across ancestries. Nature Communications 12, 1258 (2021).\n\n\n14. Harwerth, R. S., Carter-Dawson, L., Shen, F., Smith III, E. L. & Crawford, M. L. J. Ganglion cell losses underlying visual field defects from experimental glaucoma. Investigative Ophthalmology & Visual Science 40, 2242–2250 (1999).\n\n\n15. Büttner, M., Ostner, J., Müller, C. L., Theis, F. J. & Schubert, B. Efficient use of paired single cell multimodal omics with contrastive multiview learning. Nature Communications 12, 6796 (2021).\n\n\n16. Fang, Z., Liu, X. & Peltz, G. GSEApy: A comprehensive package for performing gene set enrichment analysis in python. Bioinformatics 39, (2023)."
+  },
+  {
+    "objectID": "methods.html",
+    "href": "methods.html",
+    "title": "Methods & Design",
+    "section": "",
+    "text": "All analysis parameters are frozen in config/preregistration.py as a SHA256-hashed dictionary. The pipeline verifies the hash at startup via validate_preregistration() — if the dictionary has been modified after the hash was recorded, the pipeline either warns (development mode) or refuses to run (production mode).\n\n  Preregistration SHA256 (replace before data collection)\n  UNSET — run: python3 -c \"from config.preregistration import compute_hash; print(compute_hash())\"\n\n\n\n\n\n\n\nImportant\n\n\n\nLock the hash before any data touches the pipeline. Commit preregistration.py with the hash set, push to git, and register on OSF or AsPredicted. The git commit SHA and registration DOI go into registration_doi and registration_date fields in the same file.\n\n\n\n\nThe following cannot be modified after hash registration without explicit declaration in the manuscript as a deviation:\n\nQC thresholds (min genes, max % mitochondrial, min cells per sample)\nscVI configuration (batch_key, covariate structure, n_layers, n_latent, gene_likelihood)\nTerminal state marker definitions (up- and down-regulated genes per state)\nSpatial statistics parameters (bandwidths, primary bandwidth, permutation count)\nKernel weight optimization protocol (grid, metric, locking procedure)\nTherapeutic target scoring tier weights (3 / 2 / 1)\nPrimary endpoint specification (test, direction, α, power target)"
+  },
+  {
+    "objectID": "methods.html#preregistration",
+    "href": "methods.html#preregistration",
+    "title": "Methods & Design",
+    "section": "",
+    "text": "All analysis parameters are frozen in config/preregistration.py as a SHA256-hashed dictionary. The pipeline verifies the hash at startup via validate_preregistration() — if the dictionary has been modified after the hash was recorded, the pipeline either warns (development mode) or refuses to run (production mode).\n\n  Preregistration SHA256 (replace before data collection)\n  UNSET — run: python3 -c \"from config.preregistration import compute_hash; print(compute_hash())\"\n\n\n\n\n\n\n\nImportant\n\n\n\nLock the hash before any data touches the pipeline. Commit preregistration.py with the hash set, push to git, and register on OSF or AsPredicted. The git commit SHA and registration DOI go into registration_doi and registration_date fields in the same file.\n\n\n\n\nThe following cannot be modified after hash registration without explicit declaration in the manuscript as a deviation:\n\nQC thresholds (min genes, max % mitochondrial, min cells per sample)\nscVI configuration (batch_key, covariate structure, n_layers, n_latent, gene_likelihood)\nTerminal state marker definitions (up- and down-regulated genes per state)\nSpatial statistics parameters (bandwidths, primary bandwidth, permutation count)\nKernel weight optimization protocol (grid, metric, locking procedure)\nTherapeutic target scoring tier weights (3 / 2 / 1)\nPrimary endpoint specification (test, direction, α, power target)"
+  },
+  {
+    "objectID": "methods.html#primary-endpoint",
+    "href": "methods.html#primary-endpoint",
+    "title": "Methods & Design",
+    "section": "Primary Endpoint",
+    "text": "Primary Endpoint\nPreregistered primary endpoint:\n\nMoran’s I of RGC apoptotic fate probability at the mid timepoint compared to baseline, computed at the primary bandwidth of 100 µm with a Gaussian kernel (row-standardized). Statistical test: one-sided Mann-Whitney U comparing per-animal Moran’s I values between mid and baseline groups, with Benjamini-Hochberg FDR correction. α = 0.05.\n\nThe biological rationale is that spatially autocorrelated RGC apoptotic fate probability — cells with high apoptotic fate clustered near other high-fate cells — should increase as glaucomatous neurodegeneration spreads from focal injury sites. Moran’s I quantifies this spatial clustering:\n\\[\nI = \\frac{n}{\\sum_i \\sum_j w_{ij}} \\cdot \\frac{\\sum_i \\sum_j w_{ij}(y_i - \\bar{y})(y_j - \\bar{y})}{\\sum_i (y_i - \\bar{y})^2}\n\\]\nwhere \\(y_i\\) is the RGC apoptotic fate probability of cell \\(i\\), \\(w_{ij}\\) is the Gaussian spatial weight between cells \\(i\\) and \\(j\\), and \\(n\\) is the number of spatially mapped cells per section. \\(I \\in [-1, 1]\\); values approaching 1 indicate strong spatial clustering of high-fate cells.\n\nPower calculation\n\n  Power target: 0.80\n  Sample size justification\n  \n\n\n\nEffect size source\nHarwerth et al. — 40–50% RGC loss at mid-stage glaucoma (Cohen's d ≈ 0.8)\n\n\nRGC count target\n≥ 300 RGCs per group (≥ 150 minimum for medium effect Δ = 0.15)\n\n\nSpatial cells target\n≥ 800 cells/section for Moran's I power; target 400+ minimum\n\n\nBiological replicates\n5 animals × 4 timepoints = 20 Slide-tag runs\n\n\nStatistical unit\nPer-animal Moran's I (not per-cell) — avoids pseudoreplication"
+  },
+  {
+    "objectID": "methods.html#alignment-starsolo-configuration",
+    "href": "methods.html#alignment-starsolo-configuration",
+    "title": "Methods & Design",
+    "section": "Alignment: STARsolo Configuration",
+    "text": "Alignment: STARsolo Configuration\n\nSlide-tag read structure\nR1 (28 bp):  [——16 bp barcode——][——12 bp UMI——]\nR2 (variable): [——————— cDNA ———————]\nCritical STARsolo parameters for Slide-tag:\n--soloType CB_UMI_Simple\n--soloCBstart 1  --soloCBlen 16    # spatial barcode position in R1\n--soloUMIstart 17 --soloUMIlen 12  # UMI position in R1\n--soloFeatures Gene GeneFull Velocyto   # spliced + unspliced for velocity\n--outFilterMultimapNmax 10\n--outFilterScoreMinOverLread 0.3    # permissive for pre-mRNA reads\n--soloMultiMappers EM               # EM deduplication for multi-mappers\n--soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts\n\n\n\n\n\n\nWarning\n\n\n\nGTF preparation matters. Filter the genome annotation to protein-coding + lncRNA genes only before building the STAR index. Including pseudogenes inflates multi-mapping rates and can corrupt velocity estimates. Use eisar (R) or pyranges (Python) to generate pre-mRNA (intron) annotations.\n\n\n\n\nSpatial barcode registration\nAfter alignment, STARsolo cell barcodes are mapped to puck coordinates via 1-Hamming distance correction. Cells that cannot be unambiguously assigned to a puck barcode are excluded. The pipeline records per-sample spatial mapping rate in spatial_qc.json.\nQC gate: ≥ 70% of post-filter cells must have spatial coordinates. Samples below this threshold fail the alignment checkpoint.\n\n\nVelocity QC targets\n\n\n\n\n\n\n\n\nMetric\nTarget\nFailure action\n\n\n\n\nGenes with detectable unspliced\n≥ 40%\nCheck GTF intron annotation\n\n\nMedian unspliced/spliced ratio\n0.10 – 0.40\nIf &lt; 0.10: alignment issue; if &gt; 0.40: genomic DNA contamination\n\n\nUnique mapping rate\n≥ 60%\nCheck genome index; consider --outFilterScoreMinOverLread 0.2"
+  },
+  {
+    "objectID": "methods.html#batch-correction-scvi-architecture",
+    "href": "methods.html#batch-correction-scvi-architecture",
+    "title": "Methods & Design",
+    "section": "Batch Correction: scVI Architecture",
+    "text": "Batch Correction: scVI Architecture\nThe core design decision is treating sample_id as the batch key and timepoint as a biological covariate, not a batch. This distinction is critical: if timepoint is treated as batch, scVI will correct away the temporal signal that is the primary object of study.\n\\[\np(\\mathbf{x}_n \\mid \\mathbf{z}_n, \\mathbf{s}_n) = \\text{NB}\\!\\left(\\mu_{ng}, \\theta_{ng}\\right)\n\\]\n\\[\n\\mu_{ng} = \\ell_n \\cdot f_g(\\mathbf{z}_n, \\mathbf{s}_n)\n\\]\nwhere \\(\\mathbf{x}_n\\) is the observed count vector for cell \\(n\\), \\(\\mathbf{z}_n \\in \\mathbb{R}^{30}\\) is the scVI latent embedding, \\(\\mathbf{s}_n\\) is the batch (sample) indicator, \\(\\ell_n\\) is the library size scaling factor, and \\(f_g\\) is a neural network decoder per gene.\n\nConfiguration\nscvi.model.SCVI.setup_anndata(\n    adata,\n    layer                      = \"counts\",\n    batch_key                  = \"sample_id\",        # ← batch\n    categorical_covariate_keys = [\"timepoint\"],      # ← biological covariate\n    continuous_covariate_keys  = [\"pct_mito\",\n                                   \"log_total_counts\"],\n)\n\nmodel = scvi.model.SCVI(\n    adata,\n    n_layers        = 2,\n    n_latent        = 30,\n    gene_likelihood = \"nb\",\n    dispersion      = \"gene-batch\",   # per-gene, per-batch dispersion\n)"
+  },
+  {
+    "objectID": "methods.html#rna-velocity-scvi-bridge",
+    "href": "methods.html#rna-velocity-scvi-bridge",
+    "title": "Methods & Design",
+    "section": "RNA Velocity: scVI Bridge",
+    "text": "RNA Velocity: scVI Bridge\nRNA velocity requires that the neighbor graph used for scv.pp.moments() be computed in a batch-corrected space. The bridge between scVI and scVelo is a single line:\nsc.pp.neighbors(adata, use_rep=\"X_scVI\", n_neighbors=30)\nscv.pp.moments(adata, n_pcs=None, n_neighbors=30, use_rep=\"X_scVI\")\nscv.tl.recover_dynamics(adata, n_jobs=8)\nscv.tl.velocity(adata, mode=\"dynamical\")\nIf this bridge is omitted and the neighbor graph is computed from PCA instead, velocity vectors will reflect batch structure rather than biology in multi-sample datasets."
+  },
+  {
+    "objectID": "methods.html#cellrank-kernel-construction",
+    "href": "methods.html#cellrank-kernel-construction",
+    "title": "Methods & Design",
+    "section": "CellRank: Kernel Construction",
+    "text": "CellRank: Kernel Construction\nThe combined kernel balances directional information from RNA velocity with spatial neighbourhood constraints:\n\\[\n\\mathbf{T}_\\text{combined} = w \\cdot \\mathbf{T}_\\text{velocity} + (1 - w) \\cdot \\mathbf{T}_\\text{spatial}\n\\]\nwhere \\(\\mathbf{T}\\) is a row-stochastic cell-cell transition matrix and \\(w\\) is the velocity kernel weight.\n\nWeight optimization protocol\nThe weight \\(w\\) is optimized empirically before fate probabilities are extracted — this is the key preregistration discipline that prevents post-hoc trajectory fitting:\n\nAssign ground-truth terminal state labels to cells using locked marker criteria (quantile thresholds on up/down gene sets)\nGrid search \\(w \\in \\{0.1, 0.2, \\ldots, 0.9\\}\\)\nFor each \\(w\\): build kernel → run GPCCA → extract macrostate membership probabilities → compute cross-entropy loss against terminal labels\nSelect \\(\\hat{w} = \\arg\\min_w \\mathcal{L}_\\text{CE}(w)\\)\nLock \\(\\hat{w}\\) in kernel_weights.json before calling estimator.compute_fate_probabilities()\n\nThe weights file is write-once. The validation orchestrator checks that weights were locked before fate probability extraction by verifying the file’s modification timestamp precedes the fate_adata.h5ad creation timestamp.\n\n\nGPCCA macrostate scan\nGPCCA is run for \\(n_\\text{states} \\in [4, 8]\\). The optimal \\(n\\) is selected by maximizing the entropy of the coarse-grained stationary distribution — more distinct macrostates produce higher entropy when the decomposition is stable:\n\\[\nn^* = \\arg\\max_n \\left[ -\\sum_{k} \\pi_k \\log \\pi_k \\right]\n\\]"
+  },
+  {
+    "objectID": "methods.html#spatial-statistics-framework",
+    "href": "methods.html#spatial-statistics-framework",
+    "title": "Methods & Design",
+    "section": "Spatial Statistics Framework",
+    "text": "Spatial Statistics Framework\nThree analyses at three bandwidths (50, 100, 200 µm):\n\nGlobal Moran’s I\nComputed per animal (not pooled) to preserve biological replicates as the correct statistical unit. The spatial weight matrix uses a Gaussian kernel with fixed bandwidth, row-standardized:\n\\[\nw_{ij} = \\frac{\\exp\\!\\left(-\\frac{d_{ij}^2}{2\\sigma^2}\\right)}{\\sum_k \\exp\\!\\left(-\\frac{d_{ik}^2}{2\\sigma^2}\\right)}\n\\]\nSignificance is assessed via 999-permutation test (\\(p_\\text{sim}\\)), not the normal approximation.\n\n\nLocal Moran’s I (LISA)\nCells are classified into four quadrants based on their own value \\(y_i\\) and the spatially lagged value \\(\\bar{y}_i = \\sum_j w_{ij} y_j\\):\n\n\n\n\n\n\n\nQuadrant\nInterpretation\n\n\n\n\nHH — high \\(y_i\\), high \\(\\bar{y}_i\\)\nHotspot: high-fate cell surrounded by high-fate cells\n\n\nLL — low \\(y_i\\), low \\(\\bar{y}_i\\)\nColdspot: healthy region\n\n\nLH — low \\(y_i\\), high \\(\\bar{y}_i\\)\nSpatial outlier\n\n\nHL — high \\(y_i\\), low \\(\\bar{y}_i\\)\nSpatial outlier\n\n\n\n\n\nHotspot tracking\nHH clusters are tracked across timepoints using the convex hull of HH cell coordinates:\n\\[\nA_\\text{hotspot}(t) = \\text{Vol}\\!\\left[\\text{ConvexHull}\\!\\left(\\{(x_i, y_i) : \\text{quad}_i = \\text{HH}, t_i = t\\}\\right)\\right]\n\\]\nMonotonic increase in \\(A_\\text{hotspot}(t)\\) across timepoints provides secondary evidence for progressive spatial spread of neurodegeneration."
+  },
+  {
+    "objectID": "methods.html#secondary-statistical-analyses",
+    "href": "methods.html#secondary-statistical-analyses",
+    "title": "Methods & Design",
+    "section": "Secondary Statistical Analyses",
+    "text": "Secondary Statistical Analyses\n\nCell composition (scCODA)\nDirichlet-multinomial model for compositional changes across timepoints. Requires ≥ 3 biological replicates per group; pipeline targets 5.\nimport sccoda\nmodel = sccoda.util.comp_ana.CompositionalAnalysis(\n    data, formula=\"timepoint\", reference_cell_type=\"Rod\"\n)\n\n\nDriver gene temporal classification\nEach driver gene is classified into one of five temporal dynamics patterns based on expression in high-fate cells (fate probability &gt; 0.5) across timepoints:\n\n\n\n\n\n\n\n\nClass\nPattern\nSignificance\n\n\n\n\nProgressive\nMonotonically increasing\nCore disease driver throughout\n\n\nEarly\nPeak at early, decline later\nInitiation-phase target\n\n\nLate\nPeak at mid/late\nEstablished disease target\n\n\nTransient\nPeak at mid, lower at late\nAdaptive response, may be protective\n\n\nStable\nConstant across timepoints\nConstitutive — less druggable"
+  },
+  {
+    "objectID": "targets.html",
+    "href": "targets.html",
+    "title": "Therapeutic Targets",
+    "section": "",
+    "text": "Driver genes identified by CellRank’s lineage analysis are scored against a three-tier composite framework defined in the preregistration. The composite score reflects the full translational distance from a gene’s role in disease trajectory to its tractability as a therapeutic target."
+  },
+  {
+    "objectID": "targets.html#scoring-architecture",
+    "href": "targets.html#scoring-architecture",
+    "title": "Therapeutic Targets",
+    "section": "Scoring Architecture",
+    "text": "Scoring Architecture\n\\[\nS_\\text{composite} = \\frac{w_1 \\cdot \\bar{S}_1 + w_2 \\cdot \\bar{S}_2 + w_3 \\cdot \\bar{S}_3}{w_1 + w_2 + w_3}\n\\]\nwhere \\(\\bar{S}_k\\) is the mean feature score within tier \\(k\\), and weights are locked at \\(w_1 = 3\\), \\(w_2 = 2\\), \\(w_3 = 1\\) (preregistered).\n\n\n  \n    TIER 1 Weight × 3\n    Tractability\n    \n      Tractability scoreOpenTargets Platform API — number of modalities with evidence (small molecule, antibody, PROTAC, gene therapy)\n      Ocular deliverabilityHeuristic: 1.0 if secreted/receptor (intravitreal antibody feasible), 0.5 if unknown (AAV feasible), 0.0 if CNS-impermeable\n    \n  \n\n  \n    TIER 2 Weight × 2\n    Genetic Evidence\n    \n      GWAS evidenceCDKN2B, SIX6, ABCA1, CAV1, TMCO1, PMM2, GAS7 (binary: 0 or 1)\n      Mendelian evidenceMYOC, OPTN, TBK1, CYP1B1, WDR36, NTF4 (binary: 0 or 1)\n      Cross-lineage sharing(n_states − 1) / 3, capped at 1.0 — genes shared across multiple terminal states are more fundamental\n    \n  \n\n  \n    TIER 3 Weight × 1\n    Driver Characteristics\n    \n      Driver strength|Spearman r| of gene expression with fate probability (min 0, capped at 1.0)\n      Progression slope0.8 if progressive, 0.7 if late, 0.4 if early, 0.5 otherwise — captures window-of-opportunity\n      Spatial enrichment1.0 if gene enriched in LISA HH hotspots, 0.5 otherwise"
+  },
+  {
+    "objectID": "targets.html#gwas-and-mendelian-gene-evidence",
+    "href": "targets.html#gwas-and-mendelian-gene-evidence",
+    "title": "Therapeutic Targets",
+    "section": "GWAS and Mendelian Gene Evidence",
+    "text": "GWAS and Mendelian Gene Evidence\nGenes from established glaucoma genetic studies receive automatic Tier 2 binary credit. These are not modified post-hoc — the lists are frozen in the preregistration.\n\nGWAS loci (POAG)\n\n  CDKN2BSIX6ABCA1CAV1TMCO1PMM2GAS7\n\nSource: Wiggs et al. 2012; Gharahkhani et al. 2021 (&gt;240 POAG loci; subset with strong functional retinal evidence)\n\n\nMendelian glaucoma genes\n\n  MYOCOPTNTBK1CYP1B1WDR36NTF4\n\nSource: Fingert 2011; Rezaie et al. 2002"
+  },
+  {
+    "objectID": "targets.html#temporal-class-interpretation",
+    "href": "targets.html#temporal-class-interpretation",
+    "title": "Therapeutic Targets",
+    "section": "Temporal Class Interpretation",
+    "text": "Temporal Class Interpretation\nThe temporal dynamics category shapes the window-of-opportunity for therapeutic intervention:\n\n\n\n\n\n\n\n\nClass\nPattern\nIntervention strategy\n\n\n\n\nProgressive\nMonotonically increasing\nBroad disease-modifying — target throughout\n\n\nLate\nPeak at mid/late, sustained\nEstablished disease — rescue therapy\n\n\nEarly\nPeak at early, declines\nDisease initiation — prophylactic target\n\n\nTransient\nPeak at mid, resolves\nPotential adaptive response — de-risked\n\n\nStable\nNo temporal change\nConstitutive function — less disease-specific\n\n\n\nProgressive drivers in the RGC_apoptotic lineage that are also GWAS hits (CDKN2B, CAV1) or tractable (Stat3, Osmr) represent the highest-priority targets: they score in both Tier 2 (genetic evidence) and Tier 3 (high progression slope)."
+  },
+  {
+    "objectID": "targets.html#cross-lineage-interpretation",
+    "href": "targets.html#cross-lineage-interpretation",
+    "title": "Therapeutic Targets",
+    "section": "Cross-Lineage Interpretation",
+    "text": "Cross-Lineage Interpretation\nThe Jaccard similarity matrix shows the overlap between driver gene sets across terminal states. High overlap between two states indicates shared upstream biology — a single target may address multiple disease endpoints.\n\n\n\n\n\n\nNote\n\n\n\nExample interpretation. If RGC_apoptotic and Muller_reactive share 30% of their top driver genes (Jaccard = 0.30), a target with cross-lineage sharing score of 0.33 receives credit in all three tiers: it addresses the primary endpoint (RGC apoptosis), the gliotic microenvironment (Müller reactivity), and likely the neuroinflammatory component if Microglia_DAM also shares it.\nTargets shared across ≥ 3 terminal states get the maximum cross-lineage score and are flagged as pan-state drivers — the most interesting therapeutic candidates because they sit upstream of multiple independent disease endpoints."
+  },
+  {
+    "objectID": "targets.html#reading-the-output-file",
+    "href": "targets.html#reading-the-output-file",
+    "title": "Therapeutic Targets",
+    "section": "Reading the Output File",
+    "text": "Reading the Output File\ndriver_out/therapeutic_targets.csv contains one row per unique driver gene:\n\n\n\n\n\n\n\n\nColumn\nType\nDescription\n\n\n\n\ngene\nstring\nGene symbol\n\n\nstate\nstring\nPrimary terminal state where first identified\n\n\ntemporal_class\nstring\nprogressive / early / late / transient / stable\n\n\ncomposite_score\nfloat [0–1]\nFinal weighted score\n\n\ntier1_tractability\nfloat [0–1]\nOpenTargets tractability (normalized)\n\n\ntier1_ocular_deliv\nfloat [0,0.5,1]\nOcular deliverability heuristic\n\n\ntier2_gwas\nbinary\nGWAS locus membership\n\n\ntier2_mendelian\nbinary\nMendelian gene membership\n\n\ntier2_cross_lineage\nfloat [0–1]\nNormalized multi-lineage sharing\n\n\ntier3_driver_str\nfloat [0–1]\n|Spearman r| with fate probability\n\n\ntier3_slope\nfloat [0–1]\nTemporal progression weight\n\n\ntier3_spatial\nfloat [0–1]\nLISA hotspot enrichment\n\n\nn_lineages\nint\nNumber of terminal states where gene is a driver\n\n\nspearman_corr\nfloat\nRaw Spearman r (signed)\n\n\npval_adj\nfloat\nBH-adjusted p-value from driver correlation test\n\n\n\nRows are sorted by composite_score descending. The top 20 rows are the primary result table for the manuscript’s therapeutic target section."
+  },
+  {
+    "objectID": "targets.html#opentargets-integration",
+    "href": "targets.html#opentargets-integration",
+    "title": "Therapeutic Targets",
+    "section": "OpenTargets Integration",
+    "text": "OpenTargets Integration\nThe pipeline queries the OpenTargets Platform GraphQL API at GLAUCOMA_EFO = \"EFO_0000506\" (primary open-angle glaucoma).\n# Disable for offline runs:\npython3 scripts/07_lineage_drivers_and_targets.py \\\n    --adata fate_adata.h5ad \\\n    --outdir ./driver_out \\\n    --no_opentargets   # ← uses tractability_score = 0.5 for all genes\n\n\n\n\n\n\nWarning\n\n\n\nAPI rate limits. The OpenTargets query runs once per unique driver gene. With 200 top drivers × 4 terminal states = up to 800 unique genes, queries take approximately 5–10 minutes at standard API rates. The query is wrapped in try/except with a 10-second timeout; failed queries return tractability_score = 0.0 and are logged. Re-run with --no_opentargets if the API is unavailable, then manually update scores from the OpenTargets web interface for the top 20 candidates."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "",
+    "text": "Slide-tag snRNA-seq → Seurat v5 → scVI → scVelo → CellRank 2 —\n    a preregistered pipeline linking spatial fate trajectories to therapeutic targets\n    across four disease timepoints.\n  \n  \n    \n      Methods & Design →\n    \n    \n      Validation Suite →\n    \n    \n      Therapeutic Targets →"
+  },
+  {
+    "objectID": "index.html#at-a-glance",
+    "href": "index.html#at-a-glance",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "At a Glance",
+    "text": "At a Glance\n\n  \n    20\n    Slide-tag runs\n  \n  \n    4\n    Disease timepoints\n  \n  \n    11\n    Validation checkpoints\n  \n  \n    7\n    scVI tests\n  \n  \n    4\n    Terminal states\n  \n  \n    3-tier\n    Target scoring"
+  },
+  {
+    "objectID": "index.html#pipeline-dependency-graph",
+    "href": "index.html#pipeline-dependency-graph",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "Pipeline Dependency Graph",
+    "text": "Pipeline Dependency Graph\nEach node is an executable script. Arrows indicate data flow. Yellow nodes require GPU; teal nodes are R; the rest are Python.\n\n\nShow code\n%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor':'#172035','primaryTextColor':'#e8e4d9','primaryBorderColor':'#f5c842','lineColor':'#576880','secondaryColor':'#0e1629','tertiaryColor':'#050b18','edgeLabelBackground':'#0e1629','nodeBorder':'#f5c842'}}}%%\n\nflowchart TD\n    A([\"`**Raw Slide-tag FASTQ**\n    R1: barcode+UMI / R2: cDNA`\"]) --&gt; B\n\n    B[\"`**01_starsolo_alignment.sh**\n    STARsolo · Velocyto spliced/unspliced\n    Spatial barcode registration`\"]\n\n    B --&gt; C[\"`**02_seurat_processing.R**\n    QC · Clustering · Spatial mapping\n    Reference label transfer`\"]\n\n    B --&gt; D[(\"`**spatial_coordinates.tsv**\n    x_um · y_um per barcode`\")]\n\n    C --&gt; E[\"`**SeuratDisk → h5ad**\n    R → Python bridge`\"]\n    D --&gt; E\n\n    E --&gt; F[\"`**03_scvi_integration.py**\n    Batch correction · 7-test validation\n    scVI latent embedding`\"]\n\n    F --&gt; G[\"`**04_scvelo_velocity.py**\n    Dynamical mode\n    scVI neighbor graph`\"]\n\n    G --&gt; H[\"`**05_cellrank_trajectories.py**\n    VelocityKernel + SpatialKernel\n    Weight optimization · GPCCA`\"]\n\n    H --&gt; I[\"`**06_spatial_statistics.py**\n    Global Moran's I\n    LISA · Hotspot tracking`\"]\n\n    H --&gt; J[\"`**07_lineage_drivers_and_targets.py**\n    Driver genes · Temporal classification\n    GSEApy · Target scoring`\"]\n\n    I --&gt; K([\"`**PRIMARY ENDPOINT**\n    Mann-Whitney U\n    Moran's I mid vs baseline`\"])\n\n    J --&gt; L([\"`**Therapeutic targets**\n    Composite score ranked list`\"])\n\n    style A fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style B fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style C fill:#172035,stroke:#3dd6c8,color:#e8e4d9\n    style D fill:#0a0f1e,stroke:#576880,color:#9ba8bc\n    style E fill:#0e1629,stroke:#576880,color:#9ba8bc\n    style F fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style G fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style H fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style I fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style J fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style K fill:#0a0f1e,stroke:#f5c842,color:#f5c842\n    style L fill:#0a0f1e,stroke:#3dd6c8,color:#3dd6c8\n\n\n\n\n\n%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor':'#172035','primaryTextColor':'#e8e4d9','primaryBorderColor':'#f5c842','lineColor':'#576880','secondaryColor':'#0e1629','tertiaryColor':'#050b18','edgeLabelBackground':'#0e1629','nodeBorder':'#f5c842'}}}%%\n\nflowchart TD\n    A([\"`**Raw Slide-tag FASTQ**\n    R1: barcode+UMI / R2: cDNA`\"]) --&gt; B\n\n    B[\"`**01_starsolo_alignment.sh**\n    STARsolo · Velocyto spliced/unspliced\n    Spatial barcode registration`\"]\n\n    B --&gt; C[\"`**02_seurat_processing.R**\n    QC · Clustering · Spatial mapping\n    Reference label transfer`\"]\n\n    B --&gt; D[(\"`**spatial_coordinates.tsv**\n    x_um · y_um per barcode`\")]\n\n    C --&gt; E[\"`**SeuratDisk → h5ad**\n    R → Python bridge`\"]\n    D --&gt; E\n\n    E --&gt; F[\"`**03_scvi_integration.py**\n    Batch correction · 7-test validation\n    scVI latent embedding`\"]\n\n    F --&gt; G[\"`**04_scvelo_velocity.py**\n    Dynamical mode\n    scVI neighbor graph`\"]\n\n    G --&gt; H[\"`**05_cellrank_trajectories.py**\n    VelocityKernel + SpatialKernel\n    Weight optimization · GPCCA`\"]\n\n    H --&gt; I[\"`**06_spatial_statistics.py**\n    Global Moran's I\n    LISA · Hotspot tracking`\"]\n\n    H --&gt; J[\"`**07_lineage_drivers_and_targets.py**\n    Driver genes · Temporal classification\n    GSEApy · Target scoring`\"]\n\n    I --&gt; K([\"`**PRIMARY ENDPOINT**\n    Mann-Whitney U\n    Moran's I mid vs baseline`\"])\n\n    J --&gt; L([\"`**Therapeutic targets**\n    Composite score ranked list`\"])\n\n    style A fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style B fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style C fill:#172035,stroke:#3dd6c8,color:#e8e4d9\n    style D fill:#0a0f1e,stroke:#576880,color:#9ba8bc\n    style E fill:#0e1629,stroke:#576880,color:#9ba8bc\n    style F fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style G fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style H fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style I fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style J fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style K fill:#0a0f1e,stroke:#f5c842,color:#f5c842\n    style L fill:#0a0f1e,stroke:#3dd6c8,color:#3dd6c8"
+  },
+  {
+    "objectID": "index.html#experimental-design",
+    "href": "index.html#experimental-design",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "Experimental Design",
+    "text": "Experimental Design\nThe pipeline targets the mouse microbead occlusion model of glaucoma (C57BL/6J), which provides inducible IOP elevation with timed onset, wild-type background, and compatibility with Slide-tag. Contralateral eyes serve as within-animal controls.\n\n\n\n\n\n\n\n\nDesign element\nChoice\nRationale\n\n\n\n\nPlatform\nSlide-tag\nTrue single-nucleus resolution; R2 cDNA enables RNA velocity\n\n\nModel\nC57BL/6J microbead occlusion\nInducible, timed, no confounding mutations\n\n\nTimepoints\nBaseline / Early (2–4 wk) / Mid (6–8 wk) / Late (12+ wk)\nCaptures initiation through established neurodegeneration\n\n\nReplicates\n5 animals × 4 timepoints × 2 eyes\nPowers scCODA (≥3) and Moran’s I test (≥300 RGCs/group)\n\n\nTissues\nRetina cross-section + ONH\nRGC bodies + axon injury site\n\n\nControl\nContralateral eye\nWithin-animal removes inter-animal IOP variability"
+  },
+  {
+    "objectID": "index.html#key-cell-populations",
+    "href": "index.html#key-cell-populations",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "Key Cell Populations",
+    "text": "Key Cell Populations\n\n\n  \n    Primary target\n    Retinal Ganglion Cells\n    Subtypes tracked individually. Terminal state: RGC_apoptotic defined by Casp3/Casp9/Bax↑, Rbpms/Thy1↓\n  \n\n  \n    Glial response\n    Müller Glia\n    Terminal state: Muller_reactive. Gfap/Vim/Lcn2↑, Rlbp1/Glul↓. Key mediator of neuroprotection vs. toxicity switch.\n  \n\n  \n    Neuroinflammation\n    Microglia (DAM)\n    Terminal state: Microglia_DAM. Trem2/Apoe/Lpl/Cst7↑, P2ry12/Cx3cr1↓. Spatially tracked near ONH.\n  \n\n  \n    ONH-specific\n    ONH Astrocytes\n    Terminal state: Astrocyte_reactive_ONH. Gfap/Serpina3n/C3↑. Lamina cribrosa-adjacent remodeling."
+  },
+  {
+    "objectID": "index.html#reference-datasets",
+    "href": "index.html#reference-datasets",
+    "title": "Glaucoma Spatial Transcriptomics Pipeline",
+    "section": "Reference Datasets",
+    "text": "Reference Datasets\nThe pipeline uses public datasets at two points: as annotation references (cell type label transfer) and as biological benchmarks (expected gene signatures at known disease stages).\n\n\n\nDataset\nAccess\nRole\n\n\n\n\nMRCA — Li et al. 2024\nGSE243413 / SCP2560\nPrimary label transfer reference (189k adult C57BL/6J cells)\n\n\nMacosko et al. 2015\nGSE63473\nFounding annotation; baseline cell proportion priors\n\n\nTran/Sanes et al. 2019\nGSE133382\nRGC subtype atlas (46 types, ONC time series)\n\n\nBenhar et al. 2023\nGSE199317\nNon-neuronal temporal atlas post-ONC\n\n\nKeuthan et al. 2023\nGSE241782\nMicrobead bulk RNA-seq benchmark (retina + UON + MON)\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe novelty gap. No public spatial transcriptomics dataset (Slide-tag, Slide-seq, or Visium) exists for any glaucoma model — mouse, rat, or primate. The Keuthan 2023 data is the closest proxy available: bulk RNA-seq of the same microbead model with regional dissection. Your pipeline should reproduce its bulk-level signals (Gfap/Osmr/Edn2 upregulation at early timepoints; ECM remodeling in ONH) as a cross-platform validation checkpoint before primary endpoint analysis."
+  },
+  {
+    "objectID": "validation.html",
+    "href": "validation.html",
+    "title": "Validation Suite",
+    "section": "",
+    "text": "The pipeline enforces a gate-and-proceed model. The validate_pipeline.py orchestrator reads all per-stage *.json outputs and exits with code 1 if any critical checkpoint fails, blocking downstream Nextflow steps."
+  },
+  {
+    "objectID": "validation.html#stage-0-preregistration-integrity",
+    "href": "validation.html#stage-0-preregistration-integrity",
+    "title": "Validation Suite",
+    "section": "Stage 0 — Preregistration Integrity",
+    "text": "Stage 0 — Preregistration Integrity\n\n  Checkpoint 0 · Global · CRITICAL\n  Preregistration hash verification\n  \n    The SHA256 hash of the canonical JSON serialization of PREREG must\n    match the recorded value in PREREG_HASH. Any modification to\n    analysis parameters after hash registration constitutes a preregistration deviation\n    and must be declared in the manuscript.\n  \n  \n    SHA256 exact match required\n  \n\nHow to set the hash:\n# After finalizing config/preregistration.py:\npython3 -c \"from config.preregistration import compute_hash; print(compute_hash())\"\n# → Paste output into PREREG_HASH = \"...\" in the same file\n# → git commit and push\n# → Register on OSF/AsPredicted, paste DOI into registration_doi field"
+  },
+  {
+    "objectID": "validation.html#stage-1-alignment-qc",
+    "href": "validation.html#stage-1-alignment-qc",
+    "title": "Validation Suite",
+    "section": "Stage 1 — Alignment QC",
+    "text": "Stage 1 — Alignment QC\n\n  Checkpoint 1a · Per-sample · CRITICAL\n  Spatial barcode mapping rate\n  \n    Fraction of post-QC cells with valid puck coordinates (direct match or\n    1-Hamming correction). Low rates indicate puck file mismatch, barcode\n    degradation, or poor RNA quality.\n  \n  ≥ 70% cells spatially mapped\n\n\n\n  Checkpoint 1b · Per-sample · CRITICAL\n  Velocity-compatible unspliced coverage\n  \n    Two metrics from Velocyto output: (1) fraction of genes with detectable\n    unspliced counts; (2) median unspliced/spliced ratio. Both must be in range\n    for dynamical velocity to be well-estimated.\n  \n  ≥ 40% genes with unspliced · Median U/S ratio: 0.10–0.40\n\nFailure remediation:\n\n\n\n\n\n\n\n\nSymptom\nLikely cause\nAction\n\n\n\n\nSpatial mapping &lt; 70%\nWrong puck file paired to sample\nRe-check sample_sheet.csv\n\n\nUnspliced &lt; 40%\nGTF missing intron annotations\nRe-run STAR with eisar-generated intron GTF\n\n\nU/S ratio &gt; 0.40\nGenomic DNA contamination\nAdd DAPI/live-dead sort step; tighten max_pct_mito threshold\n\n\nU/S ratio &lt; 0.10\nsnRNA degradation; very fast splicing\nConsider using GeneFull (pre-mRNA) as proxy"
+  },
+  {
+    "objectID": "validation.html#stage-2-seurat-qc",
+    "href": "validation.html#stage-2-seurat-qc",
+    "title": "Validation Suite",
+    "section": "Stage 2 — Seurat QC",
+    "text": "Stage 2 — Seurat QC\n\n  Checkpoint 2 · Per-sample · CRITICAL\n  Minimum cell count post-QC\n  \n    Per-sample cell count after applying all exclusion criteria (min genes,\n    max % mito, min/max counts). Samples below threshold are excluded from\n    the merged analysis entirely — not imputed or padded.\n  \n  ≥ 1,000 cells per sample\n\nExclusion criteria (frozen in PREREG[\"exclusion_criteria\"]):\n{\n    \"cells\": {\n        \"min_genes_detected\": 200,\n        \"max_pct_mitochondrial\": 20.0,\n        \"min_counts\": 500,\n        \"max_counts\": 25000,      # doublet proxy\n    },\n    \"samples\": {\n        \"min_cells_post_qc\": 1000,\n        \"min_iop_elevation_mmhg\": 15,\n        \"min_spatially_mapped_fraction\": 0.70,\n    }\n}"
+  },
+  {
+    "objectID": "validation.html#stage-3-scvi-validation-7-tests",
+    "href": "validation.html#stage-3-scvi-validation-7-tests",
+    "title": "Validation Suite",
+    "section": "Stage 3 — scVI Validation (7 tests)",
+    "text": "Stage 3 — scVI Validation (7 tests)\nAll 7 tests must pass. The validation module produces validation_report.json with per-test passed, metric, threshold, and details fields. The Nextflow VALIDATE_PIPELINE process reads this file and blocks downstream steps if any test fails.\n\n  Test 1 · Posterior predictive check · CRITICAL\n  Count distribution fidelity\n  \n    For a random subset of 1,000 genes: draw 100 posterior samples from the\n    scVI model and compare each gene's predicted distribution to observed\n    counts via 2-sample KS test. Genes pass if KS p &gt; 0.05.\n  \n  ≥ 50% of tested genes pass (KS p &gt; 0.05)\n\n\n\n  Test 2 · Batch silhouette · CRITICAL\n  Batch correction quality\n  \n    Compute silhouette scores for batch labels (should be low — batches\n    mixed) and cell type labels (should be preserved — cell types separated)\n    in the scVI latent space. A combined score captures the tradeoff.\n  \n  bio_silhouette − batch_silhouette &gt; 0.5\n\n\n\n  Test 3 · Reconstruction accuracy · CRITICAL\n  Expression recovery\n  \n    For 200 randomly sampled cells: compare scVI-imputed normalized expression\n    to observed counts (normalized to 10,000) via Spearman correlation.\n    Low median r suggests the model has collapsed or underfits.\n  \n  Median Spearman r &gt; 0.4 across HVGs\n  \n    Remediation: Increase n_latent to 50–100. The default 30 may be insufficient for 20-sample datasets spanning 4 disease timepoints.\n  \n\n\n\n  Test 4 · Marker preservation · CRITICAL\n  Known retinal marker gene DE\n  \n    For each cell type × marker gene pair: test whether the marker remains\n    significantly differentially expressed in its expected cell type vs. all others\n    post-integration (Mann-Whitney U, adj. p &lt; 0.01, log₂FC &gt; 0.5).\n  \n  ≥ 70% of marker-cell_type pairs preserved\n  \n    Remediation: Add major cell types to categorical_covariate_keys. scVI may otherwise absorb cell-type variance into the batch correction.\n  \n\n\n\n  Test 5 · Velocity compatibility · NON-CRITICAL\n  scVelo readiness\n  \n    Run scVelo stochastic velocity on the scVI neighbor graph as a pre-flight check.\n    Mean velocity confidence &lt; 0.7 indicates the spliced/unspliced ratio is\n    too noisy for VelocityKernel in CellRank.\n  \n  Mean velocity confidence &gt; 0.7 · Mean velocity length &gt; 0.1\n  \n    Fallback: If this test fails, substitute PseudotimeKernel for VelocityKernel in CellRank. Declare the substitution as a preregistration deviation.\n  \n\n\n\n  Test 6 · Stability · CRITICAL\n  Seed stability (5 independent runs)\n  \n    Train scVI five times with different random seeds. Cluster each latent\n    representation with k-means (k = 15). Compute pairwise adjusted Rand\n    index across all seed pairs. Low ARI indicates the model is not learning\n    stable structure.\n  \n  Mean pairwise ARI &gt; 0.8\n  \n    Note: This is the slowest test (~5× training time). Use --skip_t6_stability during development and enable for the final registered run.\n  \n\n\n\n  Test 7 · Biological validation · CRITICAL\n  Three biological sub-checks\n  \n    Sub-check 7a: AUROC &gt; 0.7 for RGC and Müller glia markers in annotated clusters.\n    Sub-check 7b: Reactive gliosis markers (Gfap, Vim, Lcn2) increase baseline → late.\n    Sub-check 7c: Trem2 enrichment near ONH in spatially-mapped cells (Mann-Whitney p &lt; 0.05).\n  \n  ≥ 60% of sub-checks pass"
+  },
+  {
+    "objectID": "validation.html#stage-4-velocity-qc",
+    "href": "validation.html#stage-4-velocity-qc",
+    "title": "Validation Suite",
+    "section": "Stage 4 — Velocity QC",
+    "text": "Stage 4 — Velocity QC\n\n  Checkpoint 4 · NON-CRITICAL (fallback available)\n  Dynamical velocity model fit quality\n  \n    Reads velocity_qc.json produced by scVelo. Mean velocity confidence\n    and length are computed after dynamical model fitting (more stringent than the\n    pre-flight stochastic check in scVI Test 5).\n  \n  Mean velocity confidence &gt; 0.7 · Mean velocity length &gt; 0.1"
+  },
+  {
+    "objectID": "validation.html#stage-5-cellrank",
+    "href": "validation.html#stage-5-cellrank",
+    "title": "Validation Suite",
+    "section": "Stage 5 — CellRank",
+    "text": "Stage 5 — CellRank\n\n  Checkpoint 5a · CRITICAL\n  Kernel weights locked before fate extraction\n  \n    Verifies that kernel_weights.json exists and contains a numeric\n    locked_velocity_weight. The validation orchestrator also checks\n    that this file's modification timestamp precedes fate_adata.h5ad.\n  \n  File exists with numeric locked_velocity_weight\n\n\n\n  Checkpoint 5b · Per terminal state · CRITICAL\n  Terminal state recovery AUROC\n  \n    Cells labeled as a terminal state by marker criteria should have high fate\n    probability for that state. AUROC quantifies how well fate probabilities\n    discriminate labeled terminal cells from all others.\n  \n  AUROC &gt; 0.75 per terminal state\n\n\nExpected terminal states\n\n\n\n\n\n\n\n\nState\nUp-regulated markers\nDown-regulated markers\n\n\n\n\nRGC_apoptotic\nCasp3, Casp9, Bax, Atf3, Sox11\nRbpms, Thy1, Sncg, Pou4f1\n\n\nMuller_reactive\nGfap, Vim, Lcn2, Osmr, Stat3\nRlbp1, Glul, Clul1\n\n\nMicroglia_DAM\nTrem2, Apoe, Lpl, Cst7, Cd68\nP2ry12, Cx3cr1, Tmem119, Sall1\n\n\nAstrocyte_reactive_ONH\nGfap, Serpina3n, C3, Lcn2\nAldh1l1, Glul, S100b"
+  },
+  {
+    "objectID": "validation.html#stage-6-spatial-statistics",
+    "href": "validation.html#stage-6-spatial-statistics",
+    "title": "Validation Suite",
+    "section": "Stage 6 — Spatial Statistics",
+    "text": "Stage 6 — Spatial Statistics\n\n  Checkpoint 6a · NON-CRITICAL (outcome reporting)\n  Primary endpoint significance\n  \n    Mann-Whitney U result for RGC apoptotic fate Moran's I: mid vs baseline.\n    This checkpoint reports the primary endpoint result — it does not block the\n    pipeline regardless of outcome. Significance is reported as-is.\n  \n  Reported; p_adj &lt; 0.05 is preregistered significance level\n\n\n\n  Checkpoint 6b · CRITICAL\n  Spatial permutation validity\n  \n    Verifies that permutation-based Moran's I p-values are non-degenerate\n    (not all identical, which would indicate a permutation bug). Checks that\n    ≥ 50% of computed p-values are unique.\n  \n  ≥ 50% unique p-values across all Moran's I tests"
+  },
+  {
+    "objectID": "validation.html#stage-7-targets",
+    "href": "validation.html#stage-7-targets",
+    "title": "Validation Suite",
+    "section": "Stage 7 — Targets",
+    "text": "Stage 7 — Targets\n\n  Checkpoint 7 · NON-CRITICAL\n  Therapeutic target table completeness\n  \n    Verifies that therapeutic_targets.csv was produced with the\n    required columns. Non-critical because a failed OpenTargets query (e.g., API\n    downtime) produces partial but still usable results.\n  \n  File present · gene, composite_score, n_lineages, tier1_tractability columns present"
+  },
+  {
+    "objectID": "validation.html#validation-report-output",
+    "href": "validation.html#validation-report-output",
+    "title": "Validation Suite",
+    "section": "Validation Report Output",
+    "text": "Validation Report Output\nRunning validate_pipeline.py produces two files:\n\npipeline_validation_report.json — machine-readable, suitable for automated CI\npipeline_validation_report.txt — human-readable summary\n\n════════════════════════════════════════════════════════════\nPIPELINE VALIDATION SUMMARY\n════════════════════════════════════════════════════════════\n  Passed: 11/11\n  Critical failures: 0\n  Status: ✅ PROCEED\n════════════════════════════════════════════════════════════\n\n\n\n\n\n\nTip\n\n\n\nCI integration. The validation orchestrator exits with code 0 (proceed) or 1 (blocked). This means you can add it as a Nextflow step with errorStrategy 'terminate' and treat a clean run as a green CI signal before committing results to the manuscript analysis directory."
+  }
+]

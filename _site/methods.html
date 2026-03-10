@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Methods &amp; Design – Glaucoma Spatial Transcriptomics</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./assets/figures/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-4c7b890cc350be7067044af900615741.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d987ab13443fbf5c9a90b41d6234bdc9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/css/custom.css">
+<meta property="og:title" content="Glaucoma Spatial Transcriptomics Pipeline">
+<meta property="og:description" content="Preregistered Slide-tag snRNA-seq → CellRank 2 pipeline">
+<meta property="og:image" content="assets/figures/og-card.png">
+<meta property="og:site_name" content="Glaucoma Spatial Transcriptomics">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./assets/figures/logo.svg" alt="Glaucoma ST Pipeline" class="navbar-logo light-content">
+    <img src="./assets/figures/logo.svg" alt="Glaucoma ST Pipeline" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Glaucoma Spatial Transcriptomics</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./methods.html" aria-current="page"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./validation.html"> 
+<span class="menu-text">Validation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./targets.html"> 
+<span class="menu-text">Targets</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./references.html"> 
+<span class="menu-text">References</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/your-lab/glaucoma-spatial-pipeline"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preregistration" id="toc-preregistration" class="nav-link active" data-scroll-target="#preregistration">Preregistration</a>
+  <ul class="collapse">
+  <li><a href="#what-is-frozen" id="toc-what-is-frozen" class="nav-link" data-scroll-target="#what-is-frozen">What is frozen</a></li>
+  </ul></li>
+  <li><a href="#primary-endpoint" id="toc-primary-endpoint" class="nav-link" data-scroll-target="#primary-endpoint">Primary Endpoint</a>
+  <ul class="collapse">
+  <li><a href="#power-calculation" id="toc-power-calculation" class="nav-link" data-scroll-target="#power-calculation">Power calculation</a></li>
+  </ul></li>
+  <li><a href="#alignment-starsolo-configuration" id="toc-alignment-starsolo-configuration" class="nav-link" data-scroll-target="#alignment-starsolo-configuration">Alignment: STARsolo Configuration</a>
+  <ul class="collapse">
+  <li><a href="#slide-tag-read-structure" id="toc-slide-tag-read-structure" class="nav-link" data-scroll-target="#slide-tag-read-structure">Slide-tag read structure</a></li>
+  <li><a href="#spatial-barcode-registration" id="toc-spatial-barcode-registration" class="nav-link" data-scroll-target="#spatial-barcode-registration">Spatial barcode registration</a></li>
+  <li><a href="#velocity-qc-targets" id="toc-velocity-qc-targets" class="nav-link" data-scroll-target="#velocity-qc-targets">Velocity QC targets</a></li>
+  </ul></li>
+  <li><a href="#batch-correction-scvi-architecture" id="toc-batch-correction-scvi-architecture" class="nav-link" data-scroll-target="#batch-correction-scvi-architecture">Batch Correction: scVI Architecture</a>
+  <ul class="collapse">
+  <li><a href="#configuration" id="toc-configuration" class="nav-link" data-scroll-target="#configuration">Configuration</a></li>
+  </ul></li>
+  <li><a href="#rna-velocity-scvi-bridge" id="toc-rna-velocity-scvi-bridge" class="nav-link" data-scroll-target="#rna-velocity-scvi-bridge">RNA Velocity: scVI Bridge</a></li>
+  <li><a href="#cellrank-kernel-construction" id="toc-cellrank-kernel-construction" class="nav-link" data-scroll-target="#cellrank-kernel-construction">CellRank: Kernel Construction</a>
+  <ul class="collapse">
+  <li><a href="#weight-optimization-protocol" id="toc-weight-optimization-protocol" class="nav-link" data-scroll-target="#weight-optimization-protocol">Weight optimization protocol</a></li>
+  <li><a href="#gpcca-macrostate-scan" id="toc-gpcca-macrostate-scan" class="nav-link" data-scroll-target="#gpcca-macrostate-scan">GPCCA macrostate scan</a></li>
+  </ul></li>
+  <li><a href="#spatial-statistics-framework" id="toc-spatial-statistics-framework" class="nav-link" data-scroll-target="#spatial-statistics-framework">Spatial Statistics Framework</a>
+  <ul class="collapse">
+  <li><a href="#global-morans-i" id="toc-global-morans-i" class="nav-link" data-scroll-target="#global-morans-i">Global Moran’s I</a></li>
+  <li><a href="#local-morans-i-lisa" id="toc-local-morans-i-lisa" class="nav-link" data-scroll-target="#local-morans-i-lisa">Local Moran’s I (LISA)</a></li>
+  <li><a href="#hotspot-tracking" id="toc-hotspot-tracking" class="nav-link" data-scroll-target="#hotspot-tracking">Hotspot tracking</a></li>
+  </ul></li>
+  <li><a href="#secondary-statistical-analyses" id="toc-secondary-statistical-analyses" class="nav-link" data-scroll-target="#secondary-statistical-analyses">Secondary Statistical Analyses</a>
+  <ul class="collapse">
+  <li><a href="#cell-composition-sccoda" id="toc-cell-composition-sccoda" class="nav-link" data-scroll-target="#cell-composition-sccoda">Cell composition (scCODA)</a></li>
+  <li><a href="#driver-gene-temporal-classification" id="toc-driver-gene-temporal-classification" class="nav-link" data-scroll-target="#driver-gene-temporal-classification">Driver gene temporal classification</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Methods &amp; Design</h1>
+<p class="subtitle lead">Preregistered analytical plan, statistical framework, and key design decisions</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="preregistration" class="level2">
+<h2 class="anchored" data-anchor-id="preregistration">Preregistration</h2>
+<p>All analysis parameters are frozen in <code>config/preregistration.py</code> as a SHA256-hashed dictionary. The pipeline verifies the hash at startup via <code>validate_preregistration()</code> — if the dictionary has been modified after the hash was recorded, the pipeline either warns (development mode) or refuses to run (production mode).</p>
+<div style="margin:1.5rem 0;">
+  <div style="font-family:'Syne',sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#9ba8bc;margin-bottom:0.5rem;">Preregistration SHA256 (replace before data collection)</div>
+  <div class="prereg-hash">UNSET — run: python3 -c "from config.preregistration import compute_hash; print(compute_hash())"</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Lock the hash before any data touches the pipeline.</strong> Commit <code>preregistration.py</code> with the hash set, push to git, and register on OSF or AsPredicted. The git commit SHA and registration DOI go into <code>registration_doi</code> and <code>registration_date</code> fields in the same file.</p>
+</div>
+</div>
+<section id="what-is-frozen" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-frozen">What is frozen</h3>
+<p>The following cannot be modified after hash registration without explicit declaration in the manuscript as a deviation:</p>
+<ul>
+<li>QC thresholds (min genes, max % mitochondrial, min cells per sample)</li>
+<li>scVI configuration (<code>batch_key</code>, covariate structure, <code>n_layers</code>, <code>n_latent</code>, <code>gene_likelihood</code>)</li>
+<li>Terminal state marker definitions (up- and down-regulated genes per state)</li>
+<li>Spatial statistics parameters (bandwidths, primary bandwidth, permutation count)</li>
+<li>Kernel weight optimization protocol (grid, metric, locking procedure)</li>
+<li>Therapeutic target scoring tier weights (3 / 2 / 1)</li>
+<li>Primary endpoint specification (test, direction, α, power target)</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="primary-endpoint" class="level2">
+<h2 class="anchored" data-anchor-id="primary-endpoint">Primary Endpoint</h2>
+<p><strong>Preregistered primary endpoint:</strong></p>
+<blockquote class="blockquote">
+<p>Moran’s I of RGC apoptotic fate probability at the mid timepoint compared to baseline, computed at the primary bandwidth of 100 µm with a Gaussian kernel (row-standardized). Statistical test: one-sided Mann-Whitney U comparing per-animal Moran’s I values between mid and baseline groups, with Benjamini-Hochberg FDR correction. α = 0.05.</p>
+</blockquote>
+<p>The biological rationale is that spatially autocorrelated RGC apoptotic fate probability — cells with high apoptotic fate clustered near other high-fate cells — should increase as glaucomatous neurodegeneration spreads from focal injury sites. Moran’s I quantifies this spatial clustering:</p>
+<p><span class="math display">\[
+I = \frac{n}{\sum_i \sum_j w_{ij}} \cdot \frac{\sum_i \sum_j w_{ij}(y_i - \bar{y})(y_j - \bar{y})}{\sum_i (y_i - \bar{y})^2}
+\]</span></p>
+<p>where <span class="math inline">\(y_i\)</span> is the RGC apoptotic fate probability of cell <span class="math inline">\(i\)</span>, <span class="math inline">\(w_{ij}\)</span> is the Gaussian spatial weight between cells <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>, and <span class="math inline">\(n\)</span> is the number of spatially mapped cells per section. <span class="math inline">\(I \in [-1, 1]\)</span>; values approaching 1 indicate strong spatial clustering of high-fate cells.</p>
+<section id="power-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="power-calculation">Power calculation</h3>
+<div class="test-block" style="border-left-color:#f5c842;">
+  <div class="test-id">Power target: 0.80</div>
+  <div class="test-title">Sample size justification</div>
+  
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
+<td style="color: #9ba8bc; padding: 0.2rem 0.5rem 0.2rem 0">Effect size source</td>
+<td>Harwerth et al. — 40–50% RGC loss at mid-stage glaucoma (Cohen's d ≈ 0.8)</td>
+</tr>
+<tr class="even">
+<td style="color: #9ba8bc; padding: 0.2rem 0.5rem 0.2rem 0">RGC count target</td>
+<td>≥ 300 RGCs per group (≥ 150 minimum for medium effect Δ = 0.15)</td>
+</tr>
+<tr class="odd">
+<td style="color: #9ba8bc; padding: 0.2rem 0.5rem 0.2rem 0">Spatial cells target</td>
+<td>≥ 800 cells/section for Moran's I power; target 400+ minimum</td>
+</tr>
+<tr class="even">
+<td style="color: #9ba8bc; padding: 0.2rem 0.5rem 0.2rem 0">Biological replicates</td>
+<td>5 animals × 4 timepoints = 20 Slide-tag runs</td>
+</tr>
+<tr class="odd">
+<td style="color: #9ba8bc; padding: 0.2rem 0.5rem 0.2rem 0">Statistical unit</td>
+<td>Per-animal Moran's I (not per-cell) — avoids pseudoreplication</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<hr>
+</section>
+</section>
+<section id="alignment-starsolo-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="alignment-starsolo-configuration">Alignment: STARsolo Configuration</h2>
+<section id="slide-tag-read-structure" class="level3">
+<h3 class="anchored" data-anchor-id="slide-tag-read-structure">Slide-tag read structure</h3>
+<pre><code>R1 (28 bp):  [——16 bp barcode——][——12 bp UMI——]
+R2 (variable): [——————— cDNA ———————]</code></pre>
+<p>Critical STARsolo parameters for Slide-tag:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloType</span> CB_UMI_Simple</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloCBstart</span> 1  <span class="at">--soloCBlen</span> 16    <span class="co"># spatial barcode position in R1</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloUMIstart</span> 17 <span class="at">--soloUMIlen</span> 12  <span class="co"># UMI position in R1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloFeatures</span> Gene GeneFull Velocyto   <span class="co"># spliced + unspliced for velocity</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">--outFilterMultimapNmax</span> 10</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">--outFilterScoreMinOverLread</span> 0.3    <span class="co"># permissive for pre-mRNA reads</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloMultiMappers</span> EM               <span class="co"># EM deduplication for multi-mappers</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">--soloCBmatchWLtype</span> 1MM_multi_Nbase_pseudocounts</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>GTF preparation matters.</strong> Filter the genome annotation to protein-coding + lncRNA genes only before building the STAR index. Including pseudogenes inflates multi-mapping rates and can corrupt velocity estimates. Use <code>eisar</code> (R) or <code>pyranges</code> (Python) to generate pre-mRNA (intron) annotations.</p>
+</div>
+</div>
+</section>
+<section id="spatial-barcode-registration" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-barcode-registration">Spatial barcode registration</h3>
+<p>After alignment, STARsolo cell barcodes are mapped to puck coordinates via 1-Hamming distance correction. Cells that cannot be unambiguously assigned to a puck barcode are excluded. The pipeline records per-sample spatial mapping rate in <code>spatial_qc.json</code>.</p>
+<p><strong>QC gate:</strong> ≥ 70% of post-filter cells must have spatial coordinates. Samples below this threshold fail the alignment checkpoint.</p>
+</section>
+<section id="velocity-qc-targets" class="level3">
+<h3 class="anchored" data-anchor-id="velocity-qc-targets">Velocity QC targets</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Target</th>
+<th>Failure action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Genes with detectable unspliced</td>
+<td>≥ 40%</td>
+<td>Check GTF intron annotation</td>
+</tr>
+<tr class="even">
+<td>Median unspliced/spliced ratio</td>
+<td>0.10 – 0.40</td>
+<td>If &lt; 0.10: alignment issue; if &gt; 0.40: genomic DNA contamination</td>
+</tr>
+<tr class="odd">
+<td>Unique mapping rate</td>
+<td>≥ 60%</td>
+<td>Check genome index; consider <code>--outFilterScoreMinOverLread 0.2</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="batch-correction-scvi-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="batch-correction-scvi-architecture">Batch Correction: scVI Architecture</h2>
+<p>The core design decision is treating <code>sample_id</code> as the batch key and <code>timepoint</code> as a <strong>biological covariate</strong>, not a batch. This distinction is critical: if timepoint is treated as batch, scVI will correct away the temporal signal that is the primary object of study.</p>
+<p><span class="math display">\[
+p(\mathbf{x}_n \mid \mathbf{z}_n, \mathbf{s}_n) = \text{NB}\!\left(\mu_{ng}, \theta_{ng}\right)
+\]</span></p>
+<p><span class="math display">\[
+\mu_{ng} = \ell_n \cdot f_g(\mathbf{z}_n, \mathbf{s}_n)
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{x}_n\)</span> is the observed count vector for cell <span class="math inline">\(n\)</span>, <span class="math inline">\(\mathbf{z}_n \in \mathbb{R}^{30}\)</span> is the scVI latent embedding, <span class="math inline">\(\mathbf{s}_n\)</span> is the batch (sample) indicator, <span class="math inline">\(\ell_n\)</span> is the library size scaling factor, and <span class="math inline">\(f_g\)</span> is a neural network decoder per gene.</p>
+<section id="configuration" class="level3">
+<h3 class="anchored" data-anchor-id="configuration">Configuration</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scvi.model.SCVI.setup_anndata(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    adata,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    layer                      <span class="op">=</span> <span class="st">"counts"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    batch_key                  <span class="op">=</span> <span class="st">"sample_id"</span>,        <span class="co"># ← batch</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    categorical_covariate_keys <span class="op">=</span> [<span class="st">"timepoint"</span>],      <span class="co"># ← biological covariate</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    continuous_covariate_keys  <span class="op">=</span> [<span class="st">"pct_mito"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"log_total_counts"</span>],</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> scvi.model.SCVI(</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    adata,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    n_layers        <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    n_latent        <span class="op">=</span> <span class="dv">30</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    gene_likelihood <span class="op">=</span> <span class="st">"nb"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    dispersion      <span class="op">=</span> <span class="st">"gene-batch"</span>,   <span class="co"># per-gene, per-batch dispersion</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="rna-velocity-scvi-bridge" class="level2">
+<h2 class="anchored" data-anchor-id="rna-velocity-scvi-bridge">RNA Velocity: scVI Bridge</h2>
+<p>RNA velocity requires that the neighbor graph used for <code>scv.pp.moments()</code> be computed in a batch-corrected space. The bridge between scVI and scVelo is a single line:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sc.pp.neighbors(adata, use_rep<span class="op">=</span><span class="st">"X_scVI"</span>, n_neighbors<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>scv.pp.moments(adata, n_pcs<span class="op">=</span><span class="va">None</span>, n_neighbors<span class="op">=</span><span class="dv">30</span>, use_rep<span class="op">=</span><span class="st">"X_scVI"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>scv.tl.recover_dynamics(adata, n_jobs<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>scv.tl.velocity(adata, mode<span class="op">=</span><span class="st">"dynamical"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If this bridge is omitted and the neighbor graph is computed from PCA instead, velocity vectors will reflect batch structure rather than biology in multi-sample datasets.</p>
+<hr>
+</section>
+<section id="cellrank-kernel-construction" class="level2">
+<h2 class="anchored" data-anchor-id="cellrank-kernel-construction">CellRank: Kernel Construction</h2>
+<p>The combined kernel balances directional information from RNA velocity with spatial neighbourhood constraints:</p>
+<p><span class="math display">\[
+\mathbf{T}_\text{combined} = w \cdot \mathbf{T}_\text{velocity} + (1 - w) \cdot \mathbf{T}_\text{spatial}
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{T}\)</span> is a row-stochastic cell-cell transition matrix and <span class="math inline">\(w\)</span> is the velocity kernel weight.</p>
+<section id="weight-optimization-protocol" class="level3">
+<h3 class="anchored" data-anchor-id="weight-optimization-protocol">Weight optimization protocol</h3>
+<p>The weight <span class="math inline">\(w\)</span> is optimized empirically before fate probabilities are extracted — this is the key preregistration discipline that prevents post-hoc trajectory fitting:</p>
+<ol type="1">
+<li>Assign ground-truth terminal state labels to cells using locked marker criteria (quantile thresholds on up/down gene sets)</li>
+<li>Grid search <span class="math inline">\(w \in \{0.1, 0.2, \ldots, 0.9\}\)</span></li>
+<li>For each <span class="math inline">\(w\)</span>: build kernel → run GPCCA → extract macrostate membership probabilities → compute cross-entropy loss against terminal labels</li>
+<li>Select <span class="math inline">\(\hat{w} = \arg\min_w \mathcal{L}_\text{CE}(w)\)</span></li>
+<li><strong>Lock</strong> <span class="math inline">\(\hat{w}\)</span> in <code>kernel_weights.json</code> before calling <code>estimator.compute_fate_probabilities()</code></li>
+</ol>
+<p>The weights file is write-once. The validation orchestrator checks that weights were locked before fate probability extraction by verifying the file’s modification timestamp precedes the <code>fate_adata.h5ad</code> creation timestamp.</p>
+</section>
+<section id="gpcca-macrostate-scan" class="level3">
+<h3 class="anchored" data-anchor-id="gpcca-macrostate-scan">GPCCA macrostate scan</h3>
+<p>GPCCA is run for <span class="math inline">\(n_\text{states} \in [4, 8]\)</span>. The optimal <span class="math inline">\(n\)</span> is selected by maximizing the entropy of the coarse-grained stationary distribution — more distinct macrostates produce higher entropy when the decomposition is stable:</p>
+<p><span class="math display">\[
+n^* = \arg\max_n \left[ -\sum_{k} \pi_k \log \pi_k \right]
+\]</span></p>
+<hr>
+</section>
+</section>
+<section id="spatial-statistics-framework" class="level2">
+<h2 class="anchored" data-anchor-id="spatial-statistics-framework">Spatial Statistics Framework</h2>
+<p>Three analyses at three bandwidths (50, 100, 200 µm):</p>
+<section id="global-morans-i" class="level3">
+<h3 class="anchored" data-anchor-id="global-morans-i">Global Moran’s I</h3>
+<p>Computed per animal (not pooled) to preserve biological replicates as the correct statistical unit. The spatial weight matrix uses a Gaussian kernel with fixed bandwidth, row-standardized:</p>
+<p><span class="math display">\[
+w_{ij} = \frac{\exp\!\left(-\frac{d_{ij}^2}{2\sigma^2}\right)}{\sum_k \exp\!\left(-\frac{d_{ik}^2}{2\sigma^2}\right)}
+\]</span></p>
+<p>Significance is assessed via 999-permutation test (<span class="math inline">\(p_\text{sim}\)</span>), not the normal approximation.</p>
+</section>
+<section id="local-morans-i-lisa" class="level3">
+<h3 class="anchored" data-anchor-id="local-morans-i-lisa">Local Moran’s I (LISA)</h3>
+<p>Cells are classified into four quadrants based on their own value <span class="math inline">\(y_i\)</span> and the spatially lagged value <span class="math inline">\(\bar{y}_i = \sum_j w_{ij} y_j\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quadrant</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>HH</strong> — high <span class="math inline">\(y_i\)</span>, high <span class="math inline">\(\bar{y}_i\)</span></td>
+<td>Hotspot: high-fate cell surrounded by high-fate cells</td>
+</tr>
+<tr class="even">
+<td><strong>LL</strong> — low <span class="math inline">\(y_i\)</span>, low <span class="math inline">\(\bar{y}_i\)</span></td>
+<td>Coldspot: healthy region</td>
+</tr>
+<tr class="odd">
+<td><strong>LH</strong> — low <span class="math inline">\(y_i\)</span>, high <span class="math inline">\(\bar{y}_i\)</span></td>
+<td>Spatial outlier</td>
+</tr>
+<tr class="even">
+<td><strong>HL</strong> — high <span class="math inline">\(y_i\)</span>, low <span class="math inline">\(\bar{y}_i\)</span></td>
+<td>Spatial outlier</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="hotspot-tracking" class="level3">
+<h3 class="anchored" data-anchor-id="hotspot-tracking">Hotspot tracking</h3>
+<p>HH clusters are tracked across timepoints using the convex hull of HH cell coordinates:</p>
+<p><span class="math display">\[
+A_\text{hotspot}(t) = \text{Vol}\!\left[\text{ConvexHull}\!\left(\{(x_i, y_i) : \text{quad}_i = \text{HH}, t_i = t\}\right)\right]
+\]</span></p>
+<p>Monotonic increase in <span class="math inline">\(A_\text{hotspot}(t)\)</span> across timepoints provides secondary evidence for progressive spatial spread of neurodegeneration.</p>
+<hr>
+</section>
+</section>
+<section id="secondary-statistical-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="secondary-statistical-analyses">Secondary Statistical Analyses</h2>
+<section id="cell-composition-sccoda" class="level3">
+<h3 class="anchored" data-anchor-id="cell-composition-sccoda">Cell composition (scCODA)</h3>
+<p>Dirichlet-multinomial model for compositional changes across timepoints. Requires ≥ 3 biological replicates per group; pipeline targets 5.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sccoda</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sccoda.util.comp_ana.CompositionalAnalysis(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    data, formula<span class="op">=</span><span class="st">"timepoint"</span>, reference_cell_type<span class="op">=</span><span class="st">"Rod"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="driver-gene-temporal-classification" class="level3">
+<h3 class="anchored" data-anchor-id="driver-gene-temporal-classification">Driver gene temporal classification</h3>
+<p>Each driver gene is classified into one of five temporal dynamics patterns based on expression in high-fate cells (fate probability &gt; 0.5) across timepoints:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Pattern</th>
+<th>Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Progressive</strong></td>
+<td>Monotonically increasing</td>
+<td>Core disease driver throughout</td>
+</tr>
+<tr class="even">
+<td><strong>Early</strong></td>
+<td>Peak at early, decline later</td>
+<td>Initiation-phase target</td>
+</tr>
+<tr class="odd">
+<td><strong>Late</strong></td>
+<td>Peak at mid/late</td>
+<td>Established disease target</td>
+</tr>
+<tr class="even">
+<td><strong>Transient</strong></td>
+<td>Peak at mid, lower at late</td>
+<td>Adaptive response, may be protective</td>
+</tr>
+<tr class="odd">
+<td><strong>Stable</strong></td>
+<td>Constant across timepoints</td>
+<td>Constitutive — less druggable</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2025 — Released under MIT License</p>
+</div>   
+    <div class="nav-footer-center">
+<p>Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+    <div class="nav-footer-right">
+<p>Pipeline v1.0.0</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

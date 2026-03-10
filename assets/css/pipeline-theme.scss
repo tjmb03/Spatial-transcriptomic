@@ -1,0 +1,48 @@
+/*-- scss:defaults --*/
+$navy-900:  #0a0f1e;
+$navy-800:  #0e1629;
+$navy-700:  #172035;
+$navy-600:  #1e2d47;
+$amber-400: #f5c842;
+$amber-300: #f8d96e;
+$amber-200: #fae99f;
+$teal-400:  #3dd6c8;
+$rose-400:  #f4617a;
+$text-primary:   #e8e4d9;
+$text-secondary: #9ba8bc;
+$text-muted:     #576880;
+
+$body-bg:              $navy-900;
+$body-color:           $text-primary;
+$link-color:           $amber-300;
+$link-hover-color:     $amber-200;
+$font-family-base:     "Crimson Pro", Georgia, serif;
+$font-family-code:     "JetBrains Mono", "Fira Code", monospace;
+$headings-font-family: "Syne", sans-serif;
+$font-size-base:       1.05rem;
+$line-height-base:     1.75;
+$border-radius:        6px;
+$border-color:         $navy-600;
+$navbar-bg:            #050b18;
+$navbar-fg:            $text-primary;
+$footer-bg:            #050b18;
+$f-color:   $navy-600;
+$table-striped-bg:     rgba(255,255,255,0.025);
+$callout-border-width: 3px;
+
+/*-- scss:rules --*/
+/* fix inline code chips */
+code {
+  color: #f8d96e !important;
+  background-color: rgba(245, 200, 66, 0.12) !important;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.875em;
+}
+
+pre code {
+  background-color: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+}
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap');

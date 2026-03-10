@@ -1,0 +1,349 @@
+---
+title: "Validation Suite"
+subtitle: "11 preregistered checkpoints across 7 pipeline stages — all must pass before manuscript preparation"
+---
+
+The pipeline enforces a gate-and-proceed model. The `validate_pipeline.py` orchestrator reads all per-stage `*.json` outputs and exits with code 1 if any **critical** checkpoint fails, blocking downstream Nextflow steps.
+
+```{=html}
+<div class="metric-grid" style="margin-bottom:2rem;">
+  <div class="metric-card">
+    <span class="metric-value">11</span>
+    <span class="metric-label">Total checkpoints</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">9</span>
+    <span class="metric-label">Pipeline-blocking (critical)</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">2</span>
+    <span class="metric-label">Report-only (non-critical)</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-value">7</span>
+    <span class="metric-label">scVI sub-tests</span>
+  </div>
+</div>
+```
+
+---
+
+## Stage 0 — Preregistration Integrity
+
+```{=html}
+<div class="test-block pass">
+  <div class="test-id">Checkpoint 0 · Global · CRITICAL</div>
+  <div class="test-title">Preregistration hash verification</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    The SHA256 hash of the canonical JSON serialization of <code>PREREG</code> must
+    match the recorded value in <code>PREREG_HASH</code>. Any modification to
+    analysis parameters after hash registration constitutes a preregistration deviation
+    and must be declared in the manuscript.
+  </p>
+  <div style="margin-top:0.6rem;">
+    <span class="threshold">SHA256 exact match required</span>
+  </div>
+</div>
+```
+
+**How to set the hash:**
+
+```python
+# After finalizing config/preregistration.py:
+python3 -c "from config.preregistration import compute_hash; print(compute_hash())"
+# → Paste output into PREREG_HASH = "..." in the same file
+# → git commit and push
+# → Register on OSF/AsPredicted, paste DOI into registration_doi field
+```
+
+---
+
+## Stage 1 — Alignment QC
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 1a · Per-sample · CRITICAL</div>
+  <div class="test-title">Spatial barcode mapping rate</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Fraction of post-QC cells with valid puck coordinates (direct match or
+    1-Hamming correction). Low rates indicate puck file mismatch, barcode
+    degradation, or poor RNA quality.
+  </p>
+  <span class="threshold">≥ 70% cells spatially mapped</span>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Checkpoint 1b · Per-sample · CRITICAL</div>
+  <div class="test-title">Velocity-compatible unspliced coverage</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Two metrics from Velocyto output: (1) fraction of genes with detectable
+    unspliced counts; (2) median unspliced/spliced ratio. Both must be in range
+    for dynamical velocity to be well-estimated.
+  </p>
+  <span class="threshold">≥ 40% genes with unspliced · Median U/S ratio: 0.10–0.40</span>
+</div>
+```
+
+**Failure remediation:**
+
+| Symptom | Likely cause | Action |
+|---|---|---|
+| Spatial mapping < 70% | Wrong puck file paired to sample | Re-check `sample_sheet.csv` |
+| Unspliced < 40% | GTF missing intron annotations | Re-run STAR with `eisar`-generated intron GTF |
+| U/S ratio > 0.40 | Genomic DNA contamination | Add DAPI/live-dead sort step; tighten `max_pct_mito` threshold |
+| U/S ratio < 0.10 | snRNA degradation; very fast splicing | Consider using `GeneFull` (pre-mRNA) as proxy |
+
+---
+
+## Stage 2 — Seurat QC
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 2 · Per-sample · CRITICAL</div>
+  <div class="test-title">Minimum cell count post-QC</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Per-sample cell count after applying all exclusion criteria (min genes,
+    max % mito, min/max counts). Samples below threshold are excluded from
+    the merged analysis entirely — not imputed or padded.
+  </p>
+  <span class="threshold">≥ 1,000 cells per sample</span>
+</div>
+```
+
+**Exclusion criteria** (frozen in `PREREG["exclusion_criteria"]`):
+
+```python
+{
+    "cells": {
+        "min_genes_detected": 200,
+        "max_pct_mitochondrial": 20.0,
+        "min_counts": 500,
+        "max_counts": 25000,      # doublet proxy
+    },
+    "samples": {
+        "min_cells_post_qc": 1000,
+        "min_iop_elevation_mmhg": 15,
+        "min_spatially_mapped_fraction": 0.70,
+    }
+}
+```
+
+---
+
+## Stage 3 — scVI Validation (7 tests)
+
+All 7 tests must pass. The validation module produces `validation_report.json` with per-test `passed`, `metric`, `threshold`, and `details` fields. The Nextflow `VALIDATE_PIPELINE` process reads this file and blocks downstream steps if any test fails.
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Test 1 · Posterior predictive check · CRITICAL</div>
+  <div class="test-title">Count distribution fidelity</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    For a random subset of 1,000 genes: draw 100 posterior samples from the
+    scVI model and compare each gene's predicted distribution to observed
+    counts via 2-sample KS test. Genes pass if KS p > 0.05.
+  </p>
+  <span class="threshold">≥ 50% of tested genes pass (KS p > 0.05)</span>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 2 · Batch silhouette · CRITICAL</div>
+  <div class="test-title">Batch correction quality</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Compute silhouette scores for <em>batch labels</em> (should be low — batches
+    mixed) and <em>cell type labels</em> (should be preserved — cell types separated)
+    in the scVI latent space. A combined score captures the tradeoff.
+  </p>
+  <span class="threshold">bio_silhouette − batch_silhouette &gt; 0.5</span>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 3 · Reconstruction accuracy · CRITICAL</div>
+  <div class="test-title">Expression recovery</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    For 200 randomly sampled cells: compare scVI-imputed normalized expression
+    to observed counts (normalized to 10,000) via Spearman correlation.
+    Low median r suggests the model has collapsed or underfits.
+  </p>
+  <span class="threshold">Median Spearman r &gt; 0.4 across HVGs</span>
+  <div style="margin-top:0.5rem;font-size:0.82rem;color:#9ba8bc;">
+    <strong style="color:#f5c842;">Remediation:</strong> Increase <code>n_latent</code> to 50–100. The default 30 may be insufficient for 20-sample datasets spanning 4 disease timepoints.
+  </div>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 4 · Marker preservation · CRITICAL</div>
+  <div class="test-title">Known retinal marker gene DE</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    For each cell type × marker gene pair: test whether the marker remains
+    significantly differentially expressed in its expected cell type vs. all others
+    post-integration (Mann-Whitney U, adj. p &lt; 0.01, log₂FC > 0.5).
+  </p>
+  <span class="threshold">≥ 70% of marker-cell_type pairs preserved</span>
+  <div style="margin-top:0.5rem;font-size:0.82rem;color:#9ba8bc;">
+    <strong style="color:#f5c842;">Remediation:</strong> Add major cell types to <code>categorical_covariate_keys</code>. scVI may otherwise absorb cell-type variance into the batch correction.
+  </div>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 5 · Velocity compatibility · NON-CRITICAL</div>
+  <div class="test-title">scVelo readiness</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Run scVelo stochastic velocity on the scVI neighbor graph as a pre-flight check.
+    Mean velocity confidence &lt; 0.7 indicates the spliced/unspliced ratio is
+    too noisy for VelocityKernel in CellRank.
+  </p>
+  <span class="threshold">Mean velocity confidence &gt; 0.7 · Mean velocity length &gt; 0.1</span>
+  <div style="margin-top:0.5rem;font-size:0.82rem;color:#9ba8bc;">
+    <strong style="color:#f5c842;">Fallback:</strong> If this test fails, substitute <code>PseudotimeKernel</code> for <code>VelocityKernel</code> in CellRank. Declare the substitution as a preregistration deviation.
+  </div>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 6 · Stability · CRITICAL</div>
+  <div class="test-title">Seed stability (5 independent runs)</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Train scVI five times with different random seeds. Cluster each latent
+    representation with k-means (k = 15). Compute pairwise adjusted Rand
+    index across all seed pairs. Low ARI indicates the model is not learning
+    stable structure.
+  </p>
+  <span class="threshold">Mean pairwise ARI &gt; 0.8</span>
+  <div style="margin-top:0.5rem;font-size:0.82rem;color:#9ba8bc;">
+    <strong style="color:#f5c842;">Note:</strong> This is the slowest test (~5× training time). Use <code>--skip_t6_stability</code> during development and enable for the final registered run.
+  </div>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Test 7 · Biological validation · CRITICAL</div>
+  <div class="test-title">Three biological sub-checks</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Sub-check 7a: AUROC &gt; 0.7 for RGC and Müller glia markers in annotated clusters.<br>
+    Sub-check 7b: Reactive gliosis markers (Gfap, Vim, Lcn2) increase baseline → late.<br>
+    Sub-check 7c: Trem2 enrichment near ONH in spatially-mapped cells (Mann-Whitney p &lt; 0.05).
+  </p>
+  <span class="threshold">≥ 60% of sub-checks pass</span>
+</div>
+```
+
+---
+
+## Stage 4 — Velocity QC
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 4 · NON-CRITICAL (fallback available)</div>
+  <div class="test-title">Dynamical velocity model fit quality</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Reads <code>velocity_qc.json</code> produced by scVelo. Mean velocity confidence
+    and length are computed after dynamical model fitting (more stringent than the
+    pre-flight stochastic check in scVI Test 5).
+  </p>
+  <span class="threshold">Mean velocity confidence &gt; 0.7 · Mean velocity length &gt; 0.1</span>
+</div>
+```
+
+---
+
+## Stage 5 — CellRank
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 5a · CRITICAL</div>
+  <div class="test-title">Kernel weights locked before fate extraction</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Verifies that <code>kernel_weights.json</code> exists and contains a numeric
+    <code>locked_velocity_weight</code>. The validation orchestrator also checks
+    that this file's modification timestamp precedes <code>fate_adata.h5ad</code>.
+  </p>
+  <span class="threshold">File exists with numeric locked_velocity_weight</span>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Checkpoint 5b · Per terminal state · CRITICAL</div>
+  <div class="test-title">Terminal state recovery AUROC</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Cells labeled as a terminal state by marker criteria should have high fate
+    probability for that state. AUROC quantifies how well fate probabilities
+    discriminate labeled terminal cells from all others.
+  </p>
+  <span class="threshold">AUROC &gt; 0.75 per terminal state</span>
+</div>
+```
+
+### Expected terminal states
+
+| State | Up-regulated markers | Down-regulated markers |
+|---|---|---|
+| `RGC_apoptotic` | Casp3, Casp9, Bax, Atf3, Sox11 | Rbpms, Thy1, Sncg, Pou4f1 |
+| `Muller_reactive` | Gfap, Vim, Lcn2, Osmr, Stat3 | Rlbp1, Glul, Clul1 |
+| `Microglia_DAM` | Trem2, Apoe, Lpl, Cst7, Cd68 | P2ry12, Cx3cr1, Tmem119, Sall1 |
+| `Astrocyte_reactive_ONH` | Gfap, Serpina3n, C3, Lcn2 | Aldh1l1, Glul, S100b |
+
+---
+
+## Stage 6 — Spatial Statistics
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 6a · NON-CRITICAL (outcome reporting)</div>
+  <div class="test-title">Primary endpoint significance</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Mann-Whitney U result for RGC apoptotic fate Moran's I: mid vs baseline.
+    This checkpoint reports the primary endpoint result — it does not block the
+    pipeline regardless of outcome. Significance is reported as-is.
+  </p>
+  <span class="threshold">Reported; p_adj &lt; 0.05 is preregistered significance level</span>
+</div>
+
+<div class="test-block">
+  <div class="test-id">Checkpoint 6b · CRITICAL</div>
+  <div class="test-title">Spatial permutation validity</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Verifies that permutation-based Moran's I p-values are non-degenerate
+    (not all identical, which would indicate a permutation bug). Checks that
+    ≥ 50% of computed p-values are unique.
+  </p>
+  <span class="threshold">≥ 50% unique p-values across all Moran's I tests</span>
+</div>
+```
+
+---
+
+## Stage 7 — Targets
+
+```{=html}
+<div class="test-block">
+  <div class="test-id">Checkpoint 7 · NON-CRITICAL</div>
+  <div class="test-title">Therapeutic target table completeness</div>
+  <p style="font-size:0.88rem;color:#9ba8bc;margin:0.5rem 0;">
+    Verifies that <code>therapeutic_targets.csv</code> was produced with the
+    required columns. Non-critical because a failed OpenTargets query (e.g., API
+    downtime) produces partial but still usable results.
+  </p>
+  <span class="threshold">File present · gene, composite_score, n_lineages, tier1_tractability columns present</span>
+</div>
+```
+
+---
+
+## Validation Report Output
+
+Running `validate_pipeline.py` produces two files:
+
+- `pipeline_validation_report.json` — machine-readable, suitable for automated CI
+- `pipeline_validation_report.txt` — human-readable summary
+
+```
+════════════════════════════════════════════════════════════
+PIPELINE VALIDATION SUMMARY
+════════════════════════════════════════════════════════════
+  Passed: 11/11
+  Critical failures: 0
+  Status: ✅ PROCEED
+════════════════════════════════════════════════════════════
+```
+
+::: {.callout-tip}
+**CI integration.** The validation orchestrator exits with code 0 (proceed) or 1 (blocked). This means you can add it as a Nextflow step with `errorStrategy 'terminate'` and treat a clean run as a green CI signal before committing results to the manuscript analysis directory.
+:::
