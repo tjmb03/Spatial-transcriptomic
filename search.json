@@ -121,42 +121,42 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "",
     "text": "Slide-tag snRNA-seq → Seurat v5 → scVI → scVelo → CellRank 2 —\n    a preregistered pipeline linking spatial fate trajectories to therapeutic targets\n    across four disease timepoints.\n  \n  \n    \n      Methods & Design →\n    \n    \n      Validation Suite →\n    \n    \n      Therapeutic Targets →"
   },
   {
     "objectID": "index.html#at-a-glance",
     "href": "index.html#at-a-glance",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "At a Glance",
     "text": "At a Glance\n\n  \n    20\n    Slide-tag runs\n  \n  \n    4\n    Disease timepoints\n  \n  \n    11\n    Validation checkpoints\n  \n  \n    7\n    scVI tests\n  \n  \n    4\n    Terminal states\n  \n  \n    3-tier\n    Target scoring"
   },
   {
     "objectID": "index.html#pipeline-dependency-graph",
     "href": "index.html#pipeline-dependency-graph",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "Pipeline Dependency Graph",
     "text": "Pipeline Dependency Graph\nEach node is an executable script. Arrows indicate data flow. Yellow nodes require GPU; teal nodes are R; the rest are Python.\n\n\nShow code\n%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor':'#172035','primaryTextColor':'#e8e4d9','primaryBorderColor':'#f5c842','lineColor':'#576880','secondaryColor':'#0e1629','tertiaryColor':'#050b18','edgeLabelBackground':'#0e1629','nodeBorder':'#f5c842'}}}%%\n\nflowchart TD\n    A([\"`**Raw Slide-tag FASTQ**\n    R1: barcode+UMI / R2: cDNA`\"]) --&gt; B\n\n    B[\"`**01_starsolo_alignment.sh**\n    STARsolo · Velocyto spliced/unspliced\n    Spatial barcode registration`\"]\n\n    B --&gt; C[\"`**02_seurat_processing.R**\n    QC · Clustering · Spatial mapping\n    Reference label transfer`\"]\n\n    B --&gt; D[(\"`**spatial_coordinates.tsv**\n    x_um · y_um per barcode`\")]\n\n    C --&gt; E[\"`**SeuratDisk → h5ad**\n    R → Python bridge`\"]\n    D --&gt; E\n\n    E --&gt; F[\"`**03_scvi_integration.py**\n    Batch correction · 7-test validation\n    scVI latent embedding`\"]\n\n    F --&gt; G[\"`**04_scvelo_velocity.py**\n    Dynamical mode\n    scVI neighbor graph`\"]\n\n    G --&gt; H[\"`**05_cellrank_trajectories.py**\n    VelocityKernel + SpatialKernel\n    Weight optimization · GPCCA`\"]\n\n    H --&gt; I[\"`**06_spatial_statistics.py**\n    Global Moran's I\n    LISA · Hotspot tracking`\"]\n\n    H --&gt; J[\"`**07_lineage_drivers_and_targets.py**\n    Driver genes · Temporal classification\n    GSEApy · Target scoring`\"]\n\n    I --&gt; K([\"`**PRIMARY ENDPOINT**\n    Mann-Whitney U\n    Moran's I mid vs baseline`\"])\n\n    J --&gt; L([\"`**Therapeutic targets**\n    Composite score ranked list`\"])\n\n    style A fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style B fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style C fill:#172035,stroke:#3dd6c8,color:#e8e4d9\n    style D fill:#0a0f1e,stroke:#576880,color:#9ba8bc\n    style E fill:#0e1629,stroke:#576880,color:#9ba8bc\n    style F fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style G fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style H fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style I fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style J fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style K fill:#0a0f1e,stroke:#f5c842,color:#f5c842\n    style L fill:#0a0f1e,stroke:#3dd6c8,color:#3dd6c8\n\n\n\n\n\n%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor':'#172035','primaryTextColor':'#e8e4d9','primaryBorderColor':'#f5c842','lineColor':'#576880','secondaryColor':'#0e1629','tertiaryColor':'#050b18','edgeLabelBackground':'#0e1629','nodeBorder':'#f5c842'}}}%%\n\nflowchart TD\n    A([\"`**Raw Slide-tag FASTQ**\n    R1: barcode+UMI / R2: cDNA`\"]) --&gt; B\n\n    B[\"`**01_starsolo_alignment.sh**\n    STARsolo · Velocyto spliced/unspliced\n    Spatial barcode registration`\"]\n\n    B --&gt; C[\"`**02_seurat_processing.R**\n    QC · Clustering · Spatial mapping\n    Reference label transfer`\"]\n\n    B --&gt; D[(\"`**spatial_coordinates.tsv**\n    x_um · y_um per barcode`\")]\n\n    C --&gt; E[\"`**SeuratDisk → h5ad**\n    R → Python bridge`\"]\n    D --&gt; E\n\n    E --&gt; F[\"`**03_scvi_integration.py**\n    Batch correction · 7-test validation\n    scVI latent embedding`\"]\n\n    F --&gt; G[\"`**04_scvelo_velocity.py**\n    Dynamical mode\n    scVI neighbor graph`\"]\n\n    G --&gt; H[\"`**05_cellrank_trajectories.py**\n    VelocityKernel + SpatialKernel\n    Weight optimization · GPCCA`\"]\n\n    H --&gt; I[\"`**06_spatial_statistics.py**\n    Global Moran's I\n    LISA · Hotspot tracking`\"]\n\n    H --&gt; J[\"`**07_lineage_drivers_and_targets.py**\n    Driver genes · Temporal classification\n    GSEApy · Target scoring`\"]\n\n    I --&gt; K([\"`**PRIMARY ENDPOINT**\n    Mann-Whitney U\n    Moran's I mid vs baseline`\"])\n\n    J --&gt; L([\"`**Therapeutic targets**\n    Composite score ranked list`\"])\n\n    style A fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style B fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style C fill:#172035,stroke:#3dd6c8,color:#e8e4d9\n    style D fill:#0a0f1e,stroke:#576880,color:#9ba8bc\n    style E fill:#0e1629,stroke:#576880,color:#9ba8bc\n    style F fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style G fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style H fill:#172035,stroke:#f5c842,color:#e8e4d9\n    style I fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style J fill:#0e1629,stroke:#9ba8bc,color:#e8e4d9\n    style K fill:#0a0f1e,stroke:#f5c842,color:#f5c842\n    style L fill:#0a0f1e,stroke:#3dd6c8,color:#3dd6c8"
   },
   {
     "objectID": "index.html#experimental-design",
     "href": "index.html#experimental-design",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "Experimental Design",
     "text": "Experimental Design\nThe pipeline targets the mouse microbead occlusion model of glaucoma (C57BL/6J), which provides inducible IOP elevation with timed onset, wild-type background, and compatibility with Slide-tag. Contralateral eyes serve as within-animal controls.\n\n\n\n\n\n\n\n\nDesign element\nChoice\nRationale\n\n\n\n\nPlatform\nSlide-tag\nTrue single-nucleus resolution; R2 cDNA enables RNA velocity\n\n\nModel\nC57BL/6J microbead occlusion\nInducible, timed, no confounding mutations\n\n\nTimepoints\nBaseline / Early (2–4 wk) / Mid (6–8 wk) / Late (12+ wk)\nCaptures initiation through established neurodegeneration\n\n\nReplicates\n5 animals × 4 timepoints × 2 eyes\nPowers scCODA (≥3) and Moran’s I test (≥300 RGCs/group)\n\n\nTissues\nRetina cross-section + ONH\nRGC bodies + axon injury site\n\n\nControl\nContralateral eye\nWithin-animal removes inter-animal IOP variability"
   },
   {
     "objectID": "index.html#key-cell-populations",
     "href": "index.html#key-cell-populations",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "Key Cell Populations",
     "text": "Key Cell Populations\n\n\n  \n    Primary target\n    Retinal Ganglion Cells\n    Subtypes tracked individually. Terminal state: RGC_apoptotic defined by Casp3/Casp9/Bax↑, Rbpms/Thy1↓\n  \n\n  \n    Glial response\n    Müller Glia\n    Terminal state: Muller_reactive. Gfap/Vim/Lcn2↑, Rlbp1/Glul↓. Key mediator of neuroprotection vs. toxicity switch.\n  \n\n  \n    Neuroinflammation\n    Microglia (DAM)\n    Terminal state: Microglia_DAM. Trem2/Apoe/Lpl/Cst7↑, P2ry12/Cx3cr1↓. Spatially tracked near ONH.\n  \n\n  \n    ONH-specific\n    ONH Astrocytes\n    Terminal state: Astrocyte_reactive_ONH. Gfap/Serpina3n/C3↑. Lamina cribrosa-adjacent remodeling."
   },
   {
     "objectID": "index.html#reference-datasets",
     "href": "index.html#reference-datasets",
-    "title": "Glaucoma SpatialTranscriptomics",
+    "title": "SpatialTranscriptomics",
     "section": "Reference Datasets",
     "text": "Reference Datasets\nThe pipeline uses public datasets at two points: as annotation references (cell type label transfer) and as biological benchmarks (expected gene signatures at known disease stages).\n\n\n\nDataset\nAccess\nRole\n\n\n\n\nMRCA — Li et al. 2024\nGSE243413 / SCP2560\nPrimary label transfer reference (189k adult C57BL/6J cells)\n\n\nMacosko et al. 2015\nGSE63473\nFounding annotation; baseline cell proportion priors\n\n\nTran/Sanes et al. 2019\nGSE133382\nRGC subtype atlas (46 types, ONC time series)\n\n\nBenhar et al. 2023\nGSE199317\nNon-neuronal temporal atlas post-ONC\n\n\nKeuthan et al. 2023\nGSE241782\nMicrobead bulk RNA-seq benchmark (retina + UON + MON)\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nValidation. The pipeline should reproduce its bulk-level signals in Keuthan 2023 data (Gfap/Osmr/Edn2 upregulation at early timepoints; ECM remodeling in ONH) as a cross-platform validation checkpoint before primary endpoint analysis."
   },
