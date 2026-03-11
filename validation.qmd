@@ -1,6 +1,6 @@
 ---
 title: "Validation Suite"
-subtitle: "11 preregistered checkpoints across 7 pipeline stages — all must pass before manuscript preparation"
+subtitle: "11 preregistered checkpoints across 7 pipeline stages — all must pass"
 ---
 
 The pipeline enforces a gate-and-proceed model. The `validate_pipeline.py` orchestrator reads all per-stage `*.json` outputs and exits with code 1 if any **critical** checkpoint fails, blocking downstream Nextflow steps.

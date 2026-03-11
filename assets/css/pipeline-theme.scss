@@ -1,0 +1,90 @@
+/*-- scss:defaults --*/
+$navy-950:  #050b18;
+$navy-900:  #0a0f1e;
+$navy-800:  #0e1629;
+$navy-600:  #1e2d47;
+$amber-400: #f5c842;
+$amber-300: #f8d96e;
+$amber-200: #fae99f;
+$teal-400:  #3dd6c8;
+$rose-400:  #f4617a;
+$text-primary:   #e8e4d9;
+$text-secondary: #9ba8bc;
+$text-muted:     #576880;
+
+$body-bg:              $navy-900;
+$body-color:           $text-primary;
+$link-color:           $amber-300;
+$link-hover-color:     $amber-200;
+$font-family-base:     "Crimson Pro", Georgia, serif;
+$font-family-code:     "JetBrains Mono", monospace;
+$headings-font-family: "Syne", sans-serif;
+$font-size-base:       1.05rem;
+$line-height-base:     1.75;
+$border-radius:        6px;
+$border-color:         $navy-600;
+$navbar-bg:            $navy-950;
+$navbar-fg:            $text-primary;
+$footer-bg:            $navy-950;
+$footer-fg:            $text-muted;
+$code-bg:              $navy-800;
+$code-color:           $amber-200;
+$table-border-color:   $navy-600;
+$table-striped-bg:     rgba(255,255,255,0.025);
+$callout-border-width: 3px;
+
+/*-- scss:rules --*/
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap');
+
+body { -webkit-font-smoothing: antialiased; }
+
+h1, h2, h3, h4 { letter-spacing: -0.02em; font-weight: 700; }
+h3 { color: $amber-400; }
+h2 {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(245, 200, 66, 0.2);
+  margin-top: 2.5rem;
+}
+
+.navbar { border-bottom: 1px solid rgba(245, 200, 66, 0.15); }
+.navbar-brand { font-family: "Syne", sans-serif; font-weight: 800; color: $amber-400 !important; }
+
+pre.sourceCode {
+  background: #0a0e1a !important;
+  border: 1px solid rgba(245, 200, 66, 0.12) !important;
+  border-radius: 6px !important;
+}
+
+code {
+  color: #f8d96e !important;
+  background-color: rgba(245, 200, 66, 0.12) !important;
+  border: 1px solid rgba(245, 200, 66, 0.2) !important;
+  padding: 0.15em 0.45em !important;
+  border-radius: 3px !important;
+  font-size: 0.875em !important;
+  font-family: "JetBrains Mono", monospace !important;
+}
+
+pre code {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+  padding: 0 !important;
+}
+
+.table th {
+  font-family: "Syne", sans-serif;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: $text-secondary;
+  border-bottom: 1px solid rgba(245, 200, 66, 0.2) !important;
+}
+
+.callout-note      { border-left-color: $teal-400 !important; }
+.callout-warning   { border-left-color: $amber-400 !important; }
+.callout-important { border-left-color: $rose-400 !important; }
+
+#TOC { font-size: 0.83rem; border-left: 1px solid rgba(245,200,66,0.15); padding-left: 1rem; }
+#TOC a { color: $text-secondary; text-decoration: none; }
+#TOC a:hover { color: $amber-400; }

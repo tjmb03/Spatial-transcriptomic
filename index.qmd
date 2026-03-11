@@ -183,5 +183,5 @@ The pipeline uses public datasets at two points: as annotation references (cell 
 | Keuthan et al. 2023 | [GSE241782](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE241782) | Microbead bulk RNA-seq benchmark (retina + UON + MON) |
 
 ::: {.callout-note}
-**The novelty gap.** No public spatial transcriptomics dataset (Slide-tag, Slide-seq, or Visium) exists for any glaucoma model — mouse, rat, or primate. The Keuthan 2023 data is the closest proxy available: bulk RNA-seq of the same microbead model with regional dissection. Your pipeline should reproduce its bulk-level signals (Gfap/Osmr/Edn2 upregulation at early timepoints; ECM remodeling in ONH) as a cross-platform validation checkpoint before primary endpoint analysis.
+**Validation.** The pipeline should reproduce its bulk-level signals in Keuthan 2023 data (Gfap/Osmr/Edn2 upregulation at early timepoints; ECM remodeling in ONH) as a cross-platform validation checkpoint before primary endpoint analysis.
 :::
