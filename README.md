@@ -1,6 +1,6 @@
-# Spatial Transcriptomics — Glaucoma Microenvironment Pipeline
+# Spatial Transcriptomics — Microenvironment Pipeline
 
-> A preregistered single-nucleus spatial transcriptomics pipeline for documenting pathological microenvironment development in glaucoma, combining Seurat v5 (R) and CellRank 2 (Python).
+> A preregistered single-nucleus spatial transcriptomics pipeline for documenting pathological microenvironment development, combining Seurat v5 (R) and CellRank 2 (Python).
 
 [![GitHub Pages](https://img.shields.io/badge/docs-live-f5c842?style=flat-square&logo=github)](https://tjmb03.github.io/Spatial-transcriptomic/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3dd6c8?style=flat-square)](LICENSE)
