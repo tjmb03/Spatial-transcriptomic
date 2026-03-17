@@ -227,37 +227,12 @@ jobs:
       - name: Test glaucoma-scvi
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest \
-            python -c "
-import scvi, scanpy, anndata, torch
-import scipy.sparse as sp, numpy as np
-adata = anndata.AnnData(X=sp.csr_matrix(
-    np.random.negative_binomial(2, 0.3, size=(100,50)).astype('float32')))
-adata.layers['counts'] = adata.X.copy()
-adata.obs['batch'] = ['A']*50 + ['B']*50
-scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch')
-m = scvi.model.SCVI(adata, n_latent=5)
-m.train(max_epochs=2, progress_bar=False)
-z = m.get_latent_representation()
-assert z.shape == (100, 5)
-print('scVI smoke test: PASS')
-"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest python -c "import scvi, scanpy, anndata, torch; import scipy.sparse as sp, numpy as np; adata = anndata.AnnData(X=sp.csr_matrix(np.random.negative_binomial(2, 0.3, size=(100,50)).astype('float32'))); adata.layers['counts'] = adata.X.copy(); adata.obs['batch'] = ['A']*50 + ['B']*50; scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch'); m = scvi.model.SCVI(adata, n_latent=5); m.train(max_epochs=2); z = m.get_latent_representation(); assert z.shape == (100, 5); print('scVI smoke test: PASS')"
 
       - name: Test glaucoma-cellrank
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest \
-            python -c "
-import cellrank, libpysal, esda
-import numpy as np
-from libpysal.weights import DistanceBand
-coords = np.random.uniform(0, 1000, size=(80,2))
-w = DistanceBand(coords, threshold=200, binary=False)
-w.transform = 'r'
-mi = esda.moran.Moran(np.random.uniform(0,1,80), w, permutations=49)
-assert 0 < mi.p_sim < 1
-print('CellRank + Moran test: PASS')
-"
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest python -c "import cellrank, libpysal, esda, numpy as np; from libpysal.weights import DistanceBand; coords = np.random.uniform(0, 1000, size=(80,2)); w = DistanceBand(coords, threshold=200, binary=False); w.transform = 'r'; mi = esda.moran.Moran(np.random.uniform(0,1,80), w, permutations=49); assert 0 < mi.p_sim < 1; print('CellRank + Moran test: PASS')"
 
       - name: Summary
         run: echo "All smoke tests passed"
