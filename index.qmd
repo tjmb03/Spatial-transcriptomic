@@ -1,13 +1,13 @@
 ---
-title: "Glaucoma Spatial Transcriptomics Pipeline"
-subtitle: "A preregistered single-nucleus spatial transcriptomics workflow for documenting pathological microenvironment development in glaucoma"
+title: ""
+subtitle: "A preregistered single-nucleus spatial transcriptomics workflow for documenting pathological microenvironment development"
 page-layout: full
 toc: false
 ---
 
 ```{=html}
 <section class="pipeline-hero">
-  <h1>Glaucoma <span>Spatial</span><br>Transcriptomics</h1>
+  <h1>Spatial<br><span>Transcriptomics</span></h1>
   <p class="lead">
     Slide-tag snRNA-seq → Seurat v5 → scVI → scVelo → CellRank 2 —
     a preregistered pipeline linking spatial fate trajectories to therapeutic targets

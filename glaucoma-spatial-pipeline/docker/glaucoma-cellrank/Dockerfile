@@ -56,7 +56,7 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN mkdir -p /pipeline/scripts /pipeline/config
-COPY config/preregistration.py /pipeline/config/
+COPY glaucoma-spatial-pipeline/config/preregistration.py /pipeline/config/
 
 # ── Smoke test ────────────────────────────────────────────────────────────────
 RUN python -c "\

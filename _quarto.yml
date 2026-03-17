@@ -3,16 +3,14 @@ project:
   output-dir: _site
 
 website:
-  title: "Glaucoma Spatial Transcriptomics"
+  title: "Spatial Transcriptomics"
   site-url: https://tjmb03.github.io/Spatial-transcriptomic
-  description: "Slide-tag snRNA-seq → Seurat v5 → scVI → CellRank 2 — A preregistered pipeline for glaucoma microenvironment pathology"
+  description: "Slide-tag snRNA-seq → Seurat v5 → scVI → CellRank 2 — A preregistered pipeline for microenvironment pathology"
   favicon: assets/figures/favicon.svg
 
   navbar:
     background: "#0a0f1e"
     foreground: "#e8e4d9"
-    logo: assets/figures/logo.svg
-    logo-alt: "Glaucoma ST Pipeline"
     left:
       - text: "Overview"
         href: index.qmd
@@ -38,7 +36,7 @@ website:
     right: "Pipeline v1.0.0"
 
   open-graph:
-    title: "Glaucoma Spatial Transcriptomics Pipeline"
+    title: "Spatial Transcriptomics Pipeline"
     description: "Preregistered Slide-tag snRNA-seq → CellRank 2 pipeline"
     image: assets/figures/og-card.png
 
