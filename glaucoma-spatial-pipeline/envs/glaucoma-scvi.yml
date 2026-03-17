@@ -1,0 +1,60 @@
+name: glaucoma-scvi
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  # ── Python base ───────────────────────────────────────────────────────────
+  - python=3.10.13
+
+  # ── PyTorch — CPU build (swap for GPU variant on HPC, see notes below) ───
+  - pytorch=2.1.2
+  - cpuonly
+  # GPU alternative (comment out cpuonly and uncomment these on HPC):
+  # - pytorch-cuda=11.8
+  # - cuda-toolkit=11.8
+
+  # ── Core single-cell stack ────────────────────────────────────────────────
+  - pip
+  - pip:
+    - scvi-tools==1.2.0
+    - scanpy==1.9.8
+    - anndata==0.10.3
+    - mudata==0.2.3
+
+    # ── Numerics ─────────────────────────────────────────────────────────────
+    - numpy==1.26.3
+    - scipy==1.11.4
+    - pandas==2.1.3
+    - scikit-learn==1.3.2
+
+    # ── Visualization ─────────────────────────────────────────────────────────
+    - matplotlib==3.8.2
+    - seaborn==0.13.0
+
+    # ── Validation suite dependencies ──────────────────────────────────────
+    - umap-learn==0.5.5
+    - leidenalg==0.10.2
+    - igraph==0.11.3
+
+    # ── I/O ───────────────────────────────────────────────────────────────────
+    - h5py==3.10.0
+    - loompy==3.0.7
+    - zarr==2.16.1
+
+    # ── Utilities ─────────────────────────────────────────────────────────────
+    - tqdm==4.66.1
+    - rich==13.7.0
+    - pyyaml==6.0.1
+    - requests==2.31.0    # OpenTargets API queries
+
+# ── GPU note ───────────────────────────────────────────────────────────────
+# On HPC with SLURM + GPU node:
+#   conda env create -f glaucoma-scvi.yml
+#   conda activate glaucoma-scvi
+#   pip install torch==2.1.2+cu118 --index-url https://download.pytorch.org/whl/cu118
+#
+# Verify GPU is visible inside the environment:
+#   python -c "import torch; print(torch.cuda.is_available())"

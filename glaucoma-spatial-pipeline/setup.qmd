@@ -1,0 +1,241 @@
+---
+title: "Environment Setup"
+subtitle: "Step 1 of 6 — Conda environments for the R/Python split"
+---
+
+Before any pipeline script runs, three isolated conda environments must be built and verified. The environments are designed so that no R package ever shares a namespace with Python packages, and scVI's PyTorch dependency never conflicts with CellRank's JAX dependency.
+
+---
+
+## Why Three Environments
+
+```{=html}
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0;">
+
+  <div class="test-block" style="border-left-color:#3dd6c8;">
+    <div class="test-id">Environment 1</div>
+    <div class="test-title">glaucoma-r</div>
+    <p style="font-size:0.85rem;color:#9ba8bc;margin:0.5rem 0;">
+      Seurat v5, SeuratDisk, spdep, clusterProfiler. Runs steps 01–02.
+      Produces <code>merged.h5seurat</code> → <code>merged.h5ad</code>.
+    </p>
+  </div>
+
+  <div class="test-block" style="border-left-color:#f5c842;">
+    <div class="test-id">Environment 2</div>
+    <div class="test-title">glaucoma-scvi</div>
+    <p style="font-size:0.85rem;color:#9ba8bc;margin:0.5rem 0;">
+      scVI-tools, scanpy, PyTorch. Runs step 03.
+      GPU-capable. Produces <code>integrated_adata.h5ad</code>.
+    </p>
+  </div>
+
+  <div class="test-block" style="border-left-color:#9ba8bc;">
+    <div class="test-id">Environment 3</div>
+    <div class="test-title">glaucoma-velocity</div>
+    <p style="font-size:0.85rem;color:#9ba8bc;margin:0.5rem 0;">
+      scVelo, CellRank 2, libpysal, GSEApy. Runs steps 04–07.
+      JAX backend for CellRank's OT kernel.
+    </p>
+  </div>
+
+</div>
+```
+
+The reason `glaucoma-scvi` and `glaucoma-velocity` are separate despite sharing `scanpy` and `anndata`: **PyTorch and JAX both require CUDA runtime libraries**. When installed together they compete for the same shared library versions. The conflict is silent — both import successfully but one or the other runs on CPU despite a GPU being present. Keeping them separate guarantees GPU utilization for scVI without debugging CUDA linkage issues.
+
+---
+
+## Prerequisites
+
+```bash
+# Miniconda — if not already installed
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh  # Apple Silicon
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh  # Linux / HPC
+bash Miniconda3-latest-*.sh
+
+# Verify
+conda --version   # should be >= 23.x
+```
+
+::: {.callout-note}
+**Apple Silicon (M1/M2/M3).** Use the `arm64` installer. Most packages have native ARM builds on `conda-forge`. The one exception is older PyTorch builds — use `pytorch >= 2.1` which has full MPS (Metal Performance Shaders) support for GPU acceleration on Mac.
+:::
+
+---
+
+## Build All Three Environments
+
+```bash
+cd glaucoma-spatial-pipeline/
+
+# Build + verify all three (takes 15-30 min first time)
+bash setup_envs.sh
+
+# Or build one at a time
+bash setup_envs.sh --env r
+bash setup_envs.sh --env scvi
+bash setup_envs.sh --env velocity
+
+# Verify existing environments without rebuilding
+bash setup_envs.sh --verify
+```
+
+A clean build ends with:
+
+```
+✓  glaucoma-r verified
+✓  glaucoma-scvi verified
+✓  glaucoma-velocity verified
+```
+
+---
+
+## What Each Verification Test Checks
+
+### `glaucoma-r`
+
+```r
+# Confirms:
+# 1. All packages import without errors
+# 2. Seurat and SeuratDisk versions are correct
+# 3. spdep Moran's I runs end-to-end on synthetic data
+library(spdep)
+coords <- cbind(runif(50), runif(50))
+nb <- knn2nb(knearneigh(coords, k=5))
+lw <- nb2listw(nb, style="W")
+mi <- moran.test(runif(50), lw)
+# → Moran's I test: PASS (I = ...)
+```
+
+### `glaucoma-scvi`
+
+```python
+# Confirms:
+# 1. scvi, scanpy, anndata, torch all import
+# 2. GPU availability (True on HPC, False on laptop — both acceptable)
+# 3. scVI trains a minimal model on synthetic negative binomial counts
+import scvi, anndata as ad, scipy.sparse as sp, numpy as np
+
+adata = ad.AnnData(X=sp.csr_matrix(
+    np.random.negative_binomial(2, 0.3, size=(200, 100))
+))
+adata.layers["counts"] = adata.X.copy()
+adata.obs["batch"] = ["A"] * 100 + ["B"] * 100
+scvi.model.SCVI.setup_anndata(adata, layer="counts", batch_key="batch")
+model = scvi.model.SCVI(adata, n_latent=5)
+model.train(max_epochs=3)
+latent = model.get_latent_representation()
+assert latent.shape == (200, 5)   # → PASS
+```
+
+### `glaucoma-velocity`
+
+```python
+# Confirms:
+# 1. scvelo, cellrank, libpysal, esda, gseapy all import
+# 2. Spatial weight matrix builds correctly (DistanceBand, Gaussian kernel)
+# 3. Moran's I runs with permutation test
+from libpysal.weights import DistanceBand
+import esda.moran, numpy as np
+
+coords = np.random.uniform(0, 1000, size=(100, 2))
+w = DistanceBand(coords, threshold=200, binary=False)
+w.transform = 'r'
+mi = esda.moran.Moran(np.random.uniform(0, 1, 100), w, permutations=99)
+assert 0 < mi.p_sim < 1   # → PASS
+```
+
+---
+
+## GPU Setup on HPC (SLURM)
+
+The `glaucoma-scvi` environment defaults to CPU-only PyTorch for local development. On an HPC node with CUDA, swap the PyTorch build after creating the environment:
+
+```bash
+# 1. Create the environment (CPU build installs first)
+conda env create -f envs/glaucoma-scvi.yml
+
+# 2. Activate and swap to GPU PyTorch
+conda activate glaucoma-scvi
+pip install torch==2.1.2+cu118 \
+    --index-url https://download.pytorch.org/whl/cu118
+
+# 3. Verify GPU is visible
+python -c "import torch; print('CUDA:', torch.cuda.is_available())"
+# → CUDA: True
+
+# 4. Verify scVI sees the GPU
+python -c "import scvi; scvi.settings.dl_num_workers=4; print(scvi.settings)"
+```
+
+::: {.callout-warning}
+**CUDA version must match your driver.** Run `nvidia-smi` to check your driver's maximum supported CUDA version. If your driver supports CUDA 12.x, use `cu121` instead of `cu118` in the pip install URL.
+:::
+
+---
+
+## Activating Environments Per Pipeline Step
+
+```bash
+# Step 01 — STARsolo alignment (bash, no conda needed)
+bash scripts/01_starsolo_alignment.sh
+
+# Step 02 — Seurat processing (R)
+conda activate glaucoma-r
+Rscript scripts/02_seurat_processing.R \
+    --input_dir starsolo_out/ \
+    --outdir seurat_out/
+
+# Step 03 — scVI integration (Python, GPU)
+conda activate glaucoma-scvi
+python scripts/03_scvi_integration.py \
+    --h5ad_dir seurat_out/ \
+    --sample_csv sample_sheet.csv \
+    --outdir scvi_out/
+
+# Steps 04-07 — velocity, CellRank, spatial stats, targets
+conda activate glaucoma-velocity
+python scripts/04_scvelo_velocity.py --adata scvi_out/integrated_adata.h5ad --outdir velocity_out/
+python scripts/05_cellrank_trajectories.py --adata velocity_out/velocity_adata.h5ad --outdir cellrank_out/
+python scripts/06_spatial_statistics.py --adata cellrank_out/fate_adata.h5ad --outdir spatial_out/
+python scripts/07_lineage_drivers_and_targets.py --adata cellrank_out/fate_adata.h5ad --outdir driver_out/
+```
+
+When running via Nextflow, environment activation is handled automatically per process — you never switch manually.
+
+---
+
+## Troubleshooting Common Issues
+
+| Error | Cause | Fix |
+|---|---|---|
+| `PackagesNotFoundError` on `r-seuratdisk` | Not on conda-forge yet for your platform | Install via pip inside the R env: `conda run -n glaucoma-r Rscript -e 'remotes::install_github("mojaveazure/seurat-disk")'` |
+| `ImportError: libcuda.so.1` | CUDA library mismatch | Check `nvidia-smi` version; reinstall PyTorch matching that CUDA version |
+| `OSError: GEOS library not found` | libpysal needs GEOS from conda | Confirm `geos` is installed: `conda list -n glaucoma-velocity geos` |
+| `moran.test` returns NA | Only one spatial neighbour found | Increase `k` in `knearneigh` or reduce distance threshold |
+| `torch.cuda.is_available()` returns False on HPC | CPU build installed | Follow GPU swap instructions above |
+| scVI training extremely slow | Running on CPU | Confirm GPU swap was applied; check `nvidia-smi` during training |
+
+---
+
+## Exporting Locked Environments
+
+After a successful run, export pinned environments for exact reproducibility:
+
+```bash
+conda activate glaucoma-r
+conda env export --no-builds > envs/glaucoma-r.lock.yml
+
+conda activate glaucoma-scvi
+conda env export --no-builds > envs/glaucoma-scvi.lock.yml
+
+conda activate glaucoma-velocity
+conda env export --no-builds > envs/glaucoma-velocity.lock.yml
+```
+
+Commit the `.lock.yml` files to git. These reproduce the exact environment used for the published analysis — package versions, not just constraints.
+
+::: {.callout-tip}
+**Next step.** Once all three environments verify successfully, proceed to [Step 2 — Docker containers](running.qmd), which packages these same environments into portable images for HPC and cloud execution.
+:::

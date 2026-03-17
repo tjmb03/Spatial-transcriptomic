@@ -1,0 +1,40 @@
+name: glaucoma-r
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - r-base=4.3.2
+  - r-essentials
+  - hdf5>=1.14
+  - libcurl
+  - openssl
+  - libxml2
+  - libpng
+  - libtiff
+  - libjpeg-turbo
+  - harfbuzz
+  - fribidi
+  - freetype
+  - cairo
+  - pandoc
+  - cmake
+  - pkg-config
+  - r-optparse
+  - r-jsonlite
+  - r-patchwork
+  - r-ggplot2
+  - r-dplyr
+  - r-tibble
+  - r-stringr
+  - r-matrix
+  - r-rcolorbrewer
+  - r-viridis
+  - r-scales
+  - r-remotes
+  - r-devtools
+  - r-hdf5r
+  - r-reticulate
+  - pip
+  - pip:
+    - loompy==3.0.7

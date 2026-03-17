@@ -1,0 +1,110 @@
+version: "3.9"
+
+# ── Glaucoma ST Pipeline — local test stack ───────────────────────────────────
+# Usage:
+#   docker compose run scvi        # test scVI step on synthetic data
+#   docker compose run cellrank    # test CellRank + spatial stats
+#   docker compose up              # run all steps sequentially
+#
+# Mount your data:
+#   DATA_DIR=/path/to/data docker compose run seurat
+#
+# Default mounts: ./test_data → /data, ./test_out → /out
+
+x-common: &common
+  volumes:
+    - ${DATA_DIR:-./test_data}:/data:ro
+    - ${OUT_DIR:-./test_out}:/out
+    - ./config:/pipeline/config:ro
+  environment:
+    - PYTHONUNBUFFERED=1
+
+services:
+
+  star:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/glaucoma-star/Dockerfile
+    image: glaucoma-star:1.0.0
+    container_name: glaucoma-star
+    command: >
+      bash scripts/01_starsolo_alignment.sh
+        --sample_csv /data/sample_sheet.csv
+        --genome_dir /data/genome
+        --outdir /out/starsolo
+
+  seurat:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/glaucoma-seurat/Dockerfile
+    image: glaucoma-seurat:1.0.0
+    container_name: glaucoma-seurat
+    command: >
+      Rscript scripts/02_seurat_processing.R
+        --input_dir /out/starsolo
+        --outdir /out/seurat
+    depends_on:
+      - star
+
+  scvi:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/glaucoma-scvi/Dockerfile
+    image: glaucoma-scvi:1.0.0
+    container_name: glaucoma-scvi
+    # Uncomment for GPU on Linux:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    command: >
+      python scripts/03_scvi_integration.py
+        --h5ad_dir /out/seurat
+        --sample_csv /data/sample_sheet.csv
+        --outdir /out/scvi
+        --skip_t6_stability
+    depends_on:
+      - seurat
+
+  scvelo:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/glaucoma-scvelo/Dockerfile
+    image: glaucoma-scvelo:1.0.0
+    container_name: glaucoma-scvelo
+    command: >
+      python scripts/04_scvelo_velocity.py
+        --adata /out/scvi/integrated_adata.h5ad
+        --outdir /out/velocity
+    depends_on:
+      - scvi
+
+  cellrank:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/glaucoma-cellrank/Dockerfile
+    image: glaucoma-cellrank:1.0.0
+    container_name: glaucoma-cellrank
+    command: >
+      bash -c "
+        python scripts/05_cellrank_trajectories.py
+          --adata /out/velocity/velocity_adata.h5ad
+          --outdir /out/cellrank &&
+        python scripts/06_spatial_statistics.py
+          --adata /out/cellrank/fate_adata.h5ad
+          --outdir /out/spatial &&
+        python scripts/07_lineage_drivers_and_targets.py
+          --adata /out/cellrank/fate_adata.h5ad
+          --outdir /out/drivers
+          --no_opentargets
+      "
+    depends_on:
+      - scvelo

@@ -1,0 +1,62 @@
+name: glaucoma-velocity
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # ── Python base ───────────────────────────────────────────────────────────
+  - python=3.10.13
+
+  # ── GEOS/PROJ — required by libpysal spatial weights ─────────────────────
+  - geos=3.12.1
+  - proj=9.3.1
+  - gdal=3.8.3
+
+  - pip
+  - pip:
+    # ── RNA velocity ──────────────────────────────────────────────────────
+    - scvelo==0.3.2
+
+    # ── CellRank 2 ────────────────────────────────────────────────────────
+    - cellrank==2.0.7
+    - moscot==0.3.2          # optimal transport kernel (CellRank dependency)
+    - ott-jax==0.4.4         # JAX OT backend for moscot
+
+    # ── Spatial statistics ────────────────────────────────────────────────
+    - libpysal==4.9.2        # spatial weights (Gaussian kernel)
+    - esda==2.5.1            # Moran's I, LISA
+    - splot==1.1.5           # spatial visualization
+    - spreg==1.4.1           # spatial regression (secondary)
+
+    # ── Pathway enrichment ────────────────────────────────────────────────
+    - gseapy==1.1.1
+
+    # ── Core single-cell (shared with scvi env — kept separate intentionally)
+    - scanpy==1.9.8
+    - anndata==0.10.3
+    - scvi-tools==1.2.0      # needed for scVI latent embedding access
+
+    # ── Numerics ──────────────────────────────────────────────────────────
+    - numpy==1.26.3
+    - scipy==1.11.4
+    - pandas==2.1.3
+    - scikit-learn==1.3.2
+    - statsmodels==0.14.1
+
+    # ── Visualization ─────────────────────────────────────────────────────
+    - matplotlib==3.8.2
+    - seaborn==0.13.0
+
+    # ── I/O ───────────────────────────────────────────────────────────────
+    - h5py==3.10.0
+    - loompy==3.0.7
+
+    # ── Utilities ─────────────────────────────────────────────────────────
+    - tqdm==4.66.1
+    - requests==2.31.0       # OpenTargets API
+
+# ── Why separate from glaucoma-scvi? ─────────────────────────────────────
+# CellRank 2 requires moscot which requires JAX. JAX and PyTorch
+# (required by scVI) share CUDA runtime libraries that conflict when
+# installed in the same environment. Keeping them separate avoids
+# CUDA library version mismatches that are silent and hard to debug.
