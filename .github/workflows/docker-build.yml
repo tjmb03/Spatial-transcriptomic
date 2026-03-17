@@ -1,0 +1,263 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker/**"
+      - "config/preregistration.py"
+      - ".github/workflows/docker-build.yml"
+  workflow_dispatch:        # manual trigger from GitHub UI
+    inputs:
+      image:
+        description: "Which image to build (all / star / seurat / scvi / scvelo / cellrank)"
+        required: false
+        default: "all"
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: tjmb03
+
+jobs:
+
+  # ── Job 1: build glaucoma-star ─────────────────────────────────────────────
+  build-star:
+    if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'star' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push glaucoma-star
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: glaucoma-spatial-pipeline/docker/glaucoma-star/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:1.0.0
+          cache-from: type=gha,scope=star
+          cache-to: type=gha,mode=max,scope=star
+
+  # ── Job 2: build glaucoma-seurat ──────────────────────────────────────────
+  build-seurat:
+    if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'seurat' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push glaucoma-seurat
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: glaucoma-spatial-pipeline/docker/glaucoma-seurat/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:1.0.0
+          cache-from: type=gha,scope=seurat
+          cache-to: type=gha,mode=max,scope=seurat
+
+  # ── Job 3: build glaucoma-scvi ────────────────────────────────────────────
+  build-scvi:
+    if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'scvi' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push glaucoma-scvi
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: glaucoma-spatial-pipeline/docker/glaucoma-scvi/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:1.0.0
+          cache-from: type=gha,scope=scvi
+          cache-to: type=gha,mode=max,scope=scvi
+
+  # ── Job 4: build glaucoma-scvelo ──────────────────────────────────────────
+  build-scvelo:
+    if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'scvelo' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push glaucoma-scvelo
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: glaucoma-spatial-pipeline/docker/glaucoma-scvelo/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvelo:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvelo:1.0.0
+          cache-from: type=gha,scope=scvelo
+          cache-to: type=gha,mode=max,scope=scvelo
+
+  # ── Job 5: build glaucoma-cellrank ────────────────────────────────────────
+  build-cellrank:
+    if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'cellrank' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push glaucoma-cellrank
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: glaucoma-spatial-pipeline/docker/glaucoma-cellrank/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:1.0.0
+          cache-from: type=gha,scope=cellrank
+          cache-to: type=gha,mode=max,scope=cellrank
+
+  # ── Job 6: smoke test all images ──────────────────────────────────────────
+  smoke-test:
+    needs: [build-star, build-seurat, build-scvi, build-scvelo, build-cellrank]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test glaucoma-star
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest \
+            bash -c "STAR --version && samtools --version | head -1"
+
+      - name: Test glaucoma-seurat
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest \
+            Rscript -e "
+              pkgs <- c('Seurat','SeuratDisk','spdep','DESeq2')
+              ok <- sapply(pkgs, requireNamespace, quietly=TRUE)
+              for(p in names(ok)) cat(ifelse(ok[p],'OK','FAIL'), p, '\n')
+              stopifnot(all(ok))
+            "
+
+      - name: Test glaucoma-scvi
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest \
+            python -c "
+import scvi, scanpy, anndata, torch
+import scipy.sparse as sp, numpy as np
+adata = anndata.AnnData(X=sp.csr_matrix(
+    np.random.negative_binomial(2, 0.3, size=(100,50)).astype('float32')))
+adata.layers['counts'] = adata.X.copy()
+adata.obs['batch'] = ['A']*50 + ['B']*50
+scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch')
+m = scvi.model.SCVI(adata, n_latent=5)
+m.train(max_epochs=2, progress_bar=False)
+z = m.get_latent_representation()
+assert z.shape == (100, 5)
+print('scVI smoke test: PASS')
+"
+
+      - name: Test glaucoma-cellrank
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest \
+            python -c "
+import cellrank, libpysal, esda
+import numpy as np
+from libpysal.weights import DistanceBand
+coords = np.random.uniform(0, 1000, size=(80,2))
+w = DistanceBand(coords, threshold=200, binary=False)
+w.transform = 'r'
+mi = esda.moran.Moran(np.random.uniform(0,1,80), w, permutations=49)
+assert 0 < mi.p_sim < 1
+print('CellRank + Moran test: PASS')
+"
+
+      - name: Summary
+        run: echo "All smoke tests passed"
