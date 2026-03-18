@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /pipeline/scripts /pipeline/config
-COPY glaucoma-spatial-pipeline/config/preregistration.py /pipeline/config/
+COPY microenvi-spatial-pipeline/config/preregistration.py /pipeline/config/
 
 RUN python -c "\
 import scvelo as scv; \

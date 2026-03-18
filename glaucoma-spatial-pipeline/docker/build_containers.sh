@@ -66,11 +66,11 @@ smoke_test() {
     header "Smoke test: $name"
 
     case "$name" in
-        glaucoma-star)
+        microenvi-star)
             docker run --rm "${name}:${VERSION}" \
                 bash -c "STAR --version && samtools --version | head -1"
             ;;
-        glaucoma-seurat)
+        microenvi-seurat)
             docker run --rm "${name}:${VERSION}" \
                 Rscript -e "
                     pkgs <- c('Seurat','SeuratDisk','spdep','DESeq2','limma','BiocParallel')
@@ -80,7 +80,7 @@ smoke_test() {
                     cat('All R packages OK\n')
                 "
             ;;
-        glaucoma-scvi)
+        microenvi-scvi)
             docker run --rm "${name}:${VERSION}" \
                 python -c "
 import scvi, scanpy, anndata, torch, scipy.sparse as sp, numpy as np
@@ -96,7 +96,7 @@ assert z.shape == (100, 5)
 print('scVI smoke test: PASS')
 "
             ;;
-        glaucoma-scvelo)
+        microenvi-scvelo)
             docker run --rm "${name}:${VERSION}" \
                 python -c "
 import scvelo as scv
@@ -104,7 +104,7 @@ print('scvelo:', scv.__version__)
 print('scvelo smoke test: PASS')
 "
             ;;
-        glaucoma-cellrank)
+        microenvi-cellrank)
             docker run --rm "${name}:${VERSION}" \
                 python -c "
 import cellrank as cr, libpysal, esda, gseapy
@@ -125,11 +125,11 @@ print('CellRank + spatial Moran test: PASS')
 
 # ── Images to process ─────────────────────────────────────────────────────────
 ALL_IMAGES=(
-    glaucoma-star
-    glaucoma-seurat
-    glaucoma-scvi
-    glaucoma-scvelo
-    glaucoma-cellrank
+    microenvi-star
+    microenvi-seurat
+    microenvi-scvi
+    microenvi-scvelo
+    microenvi-cellrank
 )
 
 if [[ "$TARGET" == "all" ]]; then

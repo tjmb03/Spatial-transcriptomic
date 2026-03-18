@@ -20,7 +20,7 @@ env:
 
 jobs:
 
-  # ── Job 1: build glaucoma-star ─────────────────────────────────────────────
+  # ── Job 1: build microenvi-star ─────────────────────────────────────────────
   build-star:
     if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'star' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -42,19 +42,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build and push glaucoma-star
+      - name: Build and push microenvi-star
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          file: glaucoma-spatial-pipeline/docker/glaucoma-star/Dockerfile
+          file: glaucoma-spatial-pipeline/docker/microenvi-star/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:1.0.0
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-star:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-star:1.0.0
           cache-from: type=gha,scope=star
           cache-to: type=gha,mode=max,scope=star
 
-  # ── Job 2: build glaucoma-seurat ──────────────────────────────────────────
+  # ── Job 2: build microenvi-seurat ──────────────────────────────────────────
   build-seurat:
     if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'seurat' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -76,19 +76,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build and push glaucoma-seurat
+      - name: Build and push microenvi-seurat
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          file: glaucoma-spatial-pipeline/docker/glaucoma-seurat/Dockerfile
+          file: glaucoma-spatial-pipeline/docker/microenvi-seurat/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:1.0.0
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-seurat:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-seurat:1.0.0
           cache-from: type=gha,scope=seurat
           cache-to: type=gha,mode=max,scope=seurat
 
-  # ── Job 3: build glaucoma-scvi ────────────────────────────────────────────
+  # ── Job 3: build microenvi-scvi ────────────────────────────────────────────
   build-scvi:
     if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'scvi' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -110,19 +110,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build and push glaucoma-scvi
+      - name: Build and push microenvi-scvi
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          file: glaucoma-spatial-pipeline/docker/glaucoma-scvi/Dockerfile
+          file: glaucoma-spatial-pipeline/docker/microenvi-scvi/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:1.0.0
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvi:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvi:1.0.0
           cache-from: type=gha,scope=scvi
           cache-to: type=gha,mode=max,scope=scvi
 
-  # ── Job 4: build glaucoma-scvelo ──────────────────────────────────────────
+  # ── Job 4: build microenvi-scvelo ──────────────────────────────────────────
   build-scvelo:
     if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'scvelo' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -144,19 +144,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build and push glaucoma-scvelo
+      - name: Build and push microenvi-scvelo
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          file: glaucoma-spatial-pipeline/docker/glaucoma-scvelo/Dockerfile
+          file: glaucoma-spatial-pipeline/docker/microenvi-scvelo/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvelo:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvelo:1.0.0
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvelo:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvelo:1.0.0
           cache-from: type=gha,scope=scvelo
           cache-to: type=gha,mode=max,scope=scvelo
 
-  # ── Job 5: build glaucoma-cellrank ────────────────────────────────────────
+  # ── Job 5: build microenvi-cellrank ────────────────────────────────────────
   build-cellrank:
     if: ${{ github.event.inputs.image == 'all' || github.event.inputs.image == 'cellrank' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -178,15 +178,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build and push glaucoma-cellrank
+      - name: Build and push microenvi-cellrank
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          file: glaucoma-spatial-pipeline/docker/glaucoma-cellrank/Dockerfile
+          file: glaucoma-spatial-pipeline/docker/microenvi-cellrank/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:1.0.0
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-cellrank:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-cellrank:1.0.0
           cache-from: type=gha,scope=cellrank
           cache-to: type=gha,mode=max,scope=cellrank
 
@@ -207,16 +207,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test glaucoma-star
+      - name: Test microenvi-star
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-star:latest \
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-star:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-star:latest \
             bash -c "STAR --version && samtools --version | head -1"
 
-      - name: Test glaucoma-seurat
+      - name: Test microenvi-seurat
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-seurat:latest \
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-seurat:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-seurat:latest \
             Rscript -e "
               pkgs <- c('Seurat','SeuratDisk','spdep','DESeq2')
               ok <- sapply(pkgs, requireNamespace, quietly=TRUE)
@@ -224,15 +224,15 @@ jobs:
               stopifnot(all(ok))
             "
 
-      - name: Test glaucoma-scvi
+      - name: Test microenvi-scvi
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-scvi:latest python -c "import scvi, scanpy, anndata, torch; import scipy.sparse as sp, numpy as np; adata = anndata.AnnData(X=sp.csr_matrix(np.random.negative_binomial(2, 0.3, size=(100,50)).astype('float32'))); adata.layers['counts'] = adata.X.copy(); adata.obs['batch'] = ['A']*50 + ['B']*50; scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch'); m = scvi.model.SCVI(adata, n_latent=5); m.train(max_epochs=2); z = m.get_latent_representation(); assert z.shape == (100, 5); print('scVI smoke test: PASS')"
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvi:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-scvi:latest python -c "import scvi, scanpy, anndata, torch; import scipy.sparse as sp, numpy as np; adata = anndata.AnnData(X=sp.csr_matrix(np.random.negative_binomial(2, 0.3, size=(100,50)).astype('float32'))); adata.layers['counts'] = adata.X.copy(); adata.obs['batch'] = ['A']*50 + ['B']*50; scvi.model.SCVI.setup_anndata(adata, layer='counts', batch_key='batch'); m = scvi.model.SCVI(adata, n_latent=5); m.train(max_epochs=2); z = m.get_latent_representation(); assert z.shape == (100, 5); print('scVI smoke test: PASS')"
 
-      - name: Test glaucoma-cellrank
+      - name: Test microenvi-cellrank
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest
-          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/glaucoma-cellrank:latest python -c "import cellrank, libpysal, esda, numpy as np; from libpysal.weights import DistanceBand; coords = np.random.uniform(0, 1000, size=(80,2)); w = DistanceBand(coords, threshold=200, binary=False); w.transform = 'r'; mi = esda.moran.Moran(np.random.uniform(0,1,80), w, permutations=49); assert 0 < mi.p_sim < 1; print('CellRank + Moran test: PASS')"
+          docker pull ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-cellrank:latest
+          docker run --rm ${{ env.REGISTRY }}/${{ env.OWNER }}/microenvi-cellrank:latest python -c "import cellrank, libpysal, esda, numpy as np; from libpysal.weights import DistanceBand; coords = np.random.uniform(0, 1000, size=(80,2)); w = DistanceBand(coords, threshold=200, binary=False); w.transform = 'r'; mi = esda.moran.Moran(np.random.uniform(0,1,80), w, permutations=49); assert 0 < mi.p_sim < 1; print('CellRank + Moran test: PASS')"
 
       - name: Summary
         run: echo "All smoke tests passed"

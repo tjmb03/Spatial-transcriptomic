@@ -13,7 +13,7 @@ RUN sed -i 's/^CXX =.*/CXX = g++ -std=c++17/' $(R RHOME)/etc/Makeconf && \
     sed -i 's/^CXXFLAGS =.*/CXXFLAGS = -O2 -fPIC -std=c++17/' $(R RHOME)/etc/Makeconf && \
     grep '^CXX ' $(R RHOME)/etc/Makeconf
 
-COPY glaucoma-spatial-pipeline/docker/glaucoma-seurat/install.R /tmp/install.R
+COPY microenvi-spatial-pipeline/docker/microenvi-seurat/install.R /tmp/install.R
 RUN Rscript /tmp/install.R
 
 RUN Rscript -e "install.packages('BiocManager', repos='https://cloud.r-project.org')"
@@ -29,7 +29,7 @@ RUN Rscript -e "BiocManager::install('DESeq2', ask=FALSE, update=FALSE, force=TR
 RUN Rscript -e "BiocManager::install(c('limma','BiocParallel'), ask=FALSE, update=FALSE, force=TRUE)"
 
 RUN mkdir -p /pipeline/scripts /pipeline/config
-COPY glaucoma-spatial-pipeline/config/preregistration.py /pipeline/config/
+COPY microenvi-spatial-pipeline/config/preregistration.py /pipeline/config/
 
 WORKDIR /pipeline
 CMD ["Rscript", "--help"]

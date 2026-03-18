@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y \
 
 # ── Pipeline scripts ──────────────────────────────────────────────────────────
 RUN mkdir -p /pipeline/scripts /pipeline/config /pipeline/validation
-COPY glaucoma-spatial-pipeline/config/preregistration.py /pipeline/config/
+COPY microenvi-spatial-pipeline/config/preregistration.py /pipeline/config/
 
 # ── Smoke test ────────────────────────────────────────────────────────────────
 RUN python -c "\
@@ -80,7 +80,7 @@ CMD ["python", "scripts/03_scvi_integration.py", "--help"]
 #      FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 #
 #   4. Build with:
-#      docker build -t glaucoma-scvi:gpu -f Dockerfile.gpu .
+#      docker build -t microenvi-scvi:gpu -f Dockerfile.gpu .
 #
 # The GPU image will be ~8GB vs ~3GB for CPU.
 # Use the CPU image for local development and CI.
