@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y \
 
 # ── Pipeline scripts ──────────────────────────────────────────────────────────
 RUN mkdir -p /pipeline/scripts /pipeline/config /pipeline/validation
-COPY microenvi-spatial-pipeline/config/preregistration.py /pipeline/config/
+COPY glaucoma-spatial-pipeline/config/preregistration.py /pipeline/config/
 
 # ── Smoke test ────────────────────────────────────────────────────────────────
 RUN python -c "\
