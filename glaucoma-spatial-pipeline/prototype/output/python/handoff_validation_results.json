@@ -1,0 +1,48 @@
+{
+  "h5ad_path": "prototype/output/seurat/tran2019.h5ad",
+  "all_pass": true,
+  "n_cells": 42483,
+  "n_genes": 20205,
+  "checks": {
+    "load_h5ad": {
+      "pass": true,
+      "detail": "42483 cells \u00d7 20205 genes | layers: []"
+    },
+    "cell_count_match": {
+      "pass": true,
+      "detail": "expected ~42483, got 42483"
+    },
+    "layers_present": {
+      "pass": true,
+      "detail": "present: [], counts available: True"
+    },
+    "counts_are_integers": {
+      "pass": true,
+      "detail": "min=0.0, max=1067.0, integer=True"
+    },
+    "obs_metadata": {
+      "pass": true,
+      "detail": "present: 10 cols | missing: none | timepoint: True"
+    },
+    "count_range": {
+      "pass": true,
+      "detail": "actual max (sample): 848, expected: 2818"
+    },
+    "scvi_setup": {
+      "pass": true,
+      "detail": "batch_key=sample_id | n_batches=10 | categorical_covariates=['timepoint']"
+    },
+    "scvi_train": {
+      "pass": true,
+      "detail": "trained 5 epochs | final loss: 10099.22"
+    },
+    "latent_shape": {
+      "pass": true,
+      "detail": "shape: (42483, 30), expected: (42483, 30)"
+    },
+    "biological_markers": {
+      "pass": true,
+      "detail": "RGC markers: ['Rbpms', 'Thy1', 'Sncg', 'Pou4f1', 'Nefl'] | ONC markers: ['Atf3', 'Sox11', 'Jun', 'Sprr1a'] | Rod markers: ['Rho', 'Nrl', 'Pde6b'] | found 12/12"
+    }
+  }
+}

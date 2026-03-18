@@ -202,9 +202,9 @@ class HandoffValidator:
             early_stopping=False,
         )
         self._model = model
-        losses = model.history["train_loss_epoch"].values
-        detail = f"trained 5 epochs | final loss: {losses[-1]:.2f}"
-        return losses[-1] < losses[0], detail   # loss should decrease
+        losses = model.history["train_loss_epoch"].values.flatten()
+        detail = f"trained 5 epochs | final loss: {float(losses[-1]):.2f}"
+        return float(losses[-1]) < float(losses[0]), detail   # loss should decrease
 
     def _check_latent_shape(self):
         latent = self._model.get_latent_representation()
@@ -290,13 +290,18 @@ class HandoffValidator:
 
         # Save validation results
         results_path = outdir / "handoff_validation_results.json"
+        # Convert numpy types to native Python for JSON serialization
+        serializable_results = {
+            k: {"pass": bool(v["pass"]), "detail": str(v["detail"])}
+            for k, v in self.results.items()
+        }
         with open(results_path, "w") as f:
             json.dump({
                 "h5ad_path": str(self.h5ad_path),
-                "all_pass": all(r["pass"] for r in self.results.values()),
+                "all_pass": bool(all(r["pass"] for r in self.results.values())),
                 "n_cells": int(self.adata.n_obs),
                 "n_genes": int(self.adata.n_vars),
-                "checks": self.results,
+                "checks": serializable_results,
             }, f, indent=2)
         print(f"  Results saved: {results_path}")
 

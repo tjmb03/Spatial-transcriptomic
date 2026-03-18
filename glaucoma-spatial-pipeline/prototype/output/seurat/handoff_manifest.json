@@ -1,0 +1,25 @@
+{
+  "created": "2026-03-18 13:13:56",
+  "seurat_version": "5.1.0",
+  "h5ad_path": "/Users/bma/git_repo/glaucoma_quarto_docs/glaucoma-spatial-pipeline/prototype/output/seurat/tran2019.h5ad",
+  "h5seurat_path": "/Users/bma/git_repo/glaucoma_quarto_docs/glaucoma-spatial-pipeline/prototype/output/seurat/tran2019.h5seurat",
+  "n_cells": 42483,
+  "n_genes": 20205,
+  "n_hvg": 2000,
+  "n_clusters": 55,
+  "layers_expected": [
+    "counts",
+    "data",
+    "scale.data"
+  ],
+  "obs_cols_expected": ["sample_id", "timepoint", "seurat_clusters", "nFeature_RNA", "nCount_RNA", "pct_mito", "log_total_counts"],
+  "qc_thresholds": {
+    "min_features": 200,
+    "max_pct_mito": 20
+  },
+  "count_range": {
+    "min": 0,
+    "max": 2818
+  },
+  "handoff_checksum": "93ad58e009d0d7f322be2b0339e2bbcf"
+}

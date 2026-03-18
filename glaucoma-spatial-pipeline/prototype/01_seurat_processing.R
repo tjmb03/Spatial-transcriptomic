@@ -149,8 +149,9 @@ seurat_obj$sample_id <- sapply(strsplit(cell_names, "_"), `[`, 1)
 seurat_obj$timepoint_raw <- seurat_obj$sample_id
 
 # Map to canonical timepoints
-seurat_obj$timepoint <- timepoint_map[seurat_obj$timepoint_raw]
-seurat_obj$timepoint[is.na(seurat_obj$timepoint)] <- "unknown"
+tp <- unname(timepoint_map[seurat_obj$timepoint_raw])
+tp[is.na(tp)] <- "unknown"
+seurat_obj$timepoint <- tp
 
 cat(sprintf("  Timepoints: %s\n",
             paste(table(seurat_obj$timepoint), collapse=", ")))
@@ -158,10 +159,15 @@ cat(sprintf("  Timepoints: %s\n",
 # ── QC metrics ────────────────────────────────────────────────────────────────
 cat("\nComputing QC metrics...\n")
 
-seurat_obj[["pct_mito"]] <- PercentageFeatureSet(
-    seurat_obj, pattern="^mt-|^MT-"
-)
-seurat_obj[["log_total_counts"]] <- log1p(seurat_obj$nCount_RNA)
+pct_mito_result <- PercentageFeatureSet(seurat_obj, pattern="^mt-|^MT-")
+if (is.data.frame(pct_mito_result)) {
+    pct_mito_vals <- pct_mito_result[, 1]
+} else {
+    pct_mito_vals <- as.numeric(pct_mito_result)
+}
+seurat_obj@meta.data[["pct_mito"]] <- pct_mito_vals
+seurat_obj@meta.data[["log_total_counts"]] <- log1p(
+    seurat_obj@meta.data[["nCount_RNA"]])
 
 # QC summary before filtering
 qc_before <- data.frame(
@@ -236,25 +242,43 @@ cat(sprintf("  Clusters found: %d\n", length(unique(seurat_obj$seurat_clusters))
 # ── Export QC figures ──────────────────────────────────────────────────────────
 cat("\nSaving QC figures...\n")
 
-p1 <- VlnPlot(seurat_obj,
-              features=c("nFeature_RNA", "nCount_RNA", "pct_mito"),
-              ncol=3, pt.size=0) &
-      theme(axis.text.x=element_text(angle=45, hjust=1))
+tryCatch({
+    p1 <- VlnPlot(seurat_obj,
+                  features=c("nFeature_RNA", "nCount_RNA", "pct_mito"),
+                  ncol=3, pt.size=0)
+    ggsave(file.path(opts$outdir, "qc_violin.png"),
+           p1, width=12, height=5, dpi=150)
+    cat("  Saved qc_violin.png\n")
+}, error = function(e) {
+    cat(sprintf("  Warning: QC violin plot failed (%s), skipping.\n", e$message))
+})
 
-ggsave(file.path(opts$outdir, "qc_violin.png"),
-       p1, width=12, height=5, dpi=150)
-
-p2 <- DimPlot(seurat_obj, reduction="umap",
-              group.by=c("seurat_clusters", "timepoint"),
-              ncol=2)
-ggsave(file.path(opts$outdir, "umap_clusters.png"),
-       p2, width=12, height=5, dpi=150)
+tryCatch({
+    p2 <- DimPlot(seurat_obj, reduction="umap",
+                  group.by="seurat_clusters")
+    ggsave(file.path(opts$outdir, "umap_clusters.png"),
+           p2, width=8, height=5, dpi=150)
+    cat("  Saved umap_clusters.png\n")
+}, error = function(e) {
+    cat(sprintf("  Warning: UMAP plot failed (%s), skipping.\n", e$message))
+})
 
 # ── Save h5seurat ─────────────────────────────────────────────────────────────
 cat("\nSaving h5seurat file...\n")
 h5seurat_path <- file.path(opts$outdir, "tran2019.h5seurat")
 
-SaveH5Seurat(seurat_obj, filename=h5seurat_path, overwrite=TRUE)
+# Convert Assay5 back to v3 Assay for SeuratDisk compatibility
+seurat_obj[["RNA"]] <- as(seurat_obj[["RNA"]], "Assay")
+
+# Create export copy: put raw counts as data slot, remove scale.data.
+# SeuratDisk Convert maps the "most processed" slot to X in h5ad;
+# by making counts the only slot, X in h5ad will contain raw integer counts.
+export_obj <- seurat_obj
+export_obj <- SetAssayData(export_obj, slot = "data",
+                           new.data = GetAssayData(export_obj, slot = "counts"))
+export_obj[["RNA"]]@scale.data <- matrix(nrow=0, ncol=0)
+
+SaveH5Seurat(export_obj, filename=h5seurat_path, overwrite=TRUE)
 cat(sprintf("  Saved: %s (%.1f MB)\n",
             h5seurat_path,
             file.size(h5seurat_path) / 1e6))
