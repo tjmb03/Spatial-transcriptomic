@@ -159,3 +159,5 @@ If you use this pipeline, please cite the key underlying tools:
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+> © 2026 tjmb03. This project is provided for educational and methodological
+demonstration purposes. Source code for the interactive dashboards is **available on request** for academic and research use.
