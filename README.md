@@ -1,3 +1,16 @@
+> **Disclaimer:** This repository contains a preregistered computational 
+> pipeline design and associated documentation. All reference datasets 
+> cited are publicly available (GEO accession numbers provided in 
+> documentation). No proprietary, confidential, patient-derived, or 
+> employer-affiliated data is included. Pipeline architecture and 
+> analytical frameworks represent independent methodological development 
+> conducted outside of any employment context and do not reflect the 
+> proprietary methods, data, or intellectual property of any employer 
+> or collaborator.
+>
+> This repository is released under the [MIT License](LICENSE).  
+> © 2026 Bo Ma (tjmb03). Reuse with attribution.
+
 # Spatial Transcriptomics — Microenvironment Pipeline
 
 > A preregistered single-nucleus spatial transcriptomics pipeline for documenting pathological microenvironment development, combining Seurat v5 (R) and CellRank 2 (Python).
@@ -160,4 +173,4 @@ If you use this pipeline, please cite the key underlying tools:
 
 MIT License — see [LICENSE](LICENSE) for details.
 > © 2026 tjmb03. This project is provided for educational and methodological
-demonstration purposes. Source code for the interactive dashboards is **available on request** for academic and research use.
+demonstration purposes.
